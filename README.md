@@ -30,12 +30,6 @@
 - npm 9 或更高版本
 - Git
 
-可用以下命令检查：
-
-```bash
-node -v
-npm -v
-git --version
 3. 获取项目
 
 克隆仓库：
