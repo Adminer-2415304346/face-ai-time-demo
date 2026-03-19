@@ -90,8 +90,6 @@ src/components/layout/DemoShell.vue
 
 下面是项目整体目录：
 # Project Structure
-
-
 project-root/
 ├─ public/ # 公共静态资源目录，打包时原样输出
 │ ├─ images/ # 放不需要被打包处理的图片资源
