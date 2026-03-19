@@ -31,6 +31,7 @@
     </template>
 
     <div class="card-content">
+      <!-- TODO(real-data): Real image/data modules are injected through this slot by parent views. -->
       <slot />
     </div>
 

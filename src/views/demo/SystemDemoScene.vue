@@ -80,6 +80,7 @@
       >
         <div class="query-panel">
           <div class="query-preview">
+            <!-- TODO(real-data): Replace the demo query image source with a real local/file-service image field. -->
             <img
               :src="currentCase.queryImage"
               :alt="currentCase.name"
@@ -184,6 +185,7 @@
             <div class="result-rank">Top {{ index + 1 }}</div>
 
             <div class="result-image-wrap">
+              <!-- TODO(real-data): Replace the demo retrieval image source with the real matched sample image field. -->
               <img
                 :src="item.image"
                 :alt="item.subjectId"
@@ -302,6 +304,8 @@ import { computed, ref, watch } from 'vue'
 import { ScanOutlined } from '@ant-design/icons-vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 
+// TODO(real-data): Replace all mock cases below with real API/local dataset records.
+// queryImage and results[].image are the current demo photo placeholders.
 const nonHumanCases = [
   {
     id: 'nonhuman-1',

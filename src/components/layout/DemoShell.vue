@@ -124,6 +124,7 @@
 
       <a-layout-content class="content">
         <div class="content-card">
+          <!-- TODO(real-data): Real demo pages with actual images/results are rendered here via routed views. -->
           <router-view />
         </div>
       </a-layout-content>
