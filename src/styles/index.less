@@ -1,0 +1,67 @@
+@import './theme.less';
+@import './motion.less';
+
+html,
+body,
+#app {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--demo-text-1);
+  background:
+    radial-gradient(circle at top left, rgba(201, 221, 203, 0.7), transparent 32%),
+    radial-gradient(circle at top right, rgba(213, 229, 234, 0.7), transparent 26%),
+    linear-gradient(180deg, var(--demo-bg-1) 0%, var(--demo-bg-2) 52%, var(--demo-bg-3) 100%);
+  font-family:
+    'Inter',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.glass-panel {
+  background: var(--demo-card-bg);
+  border: 1px solid var(--demo-card-border);
+  box-shadow: var(--demo-card-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.section-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.two-col {
+  grid-template-columns: minmax(320px, 420px) 1fr;
+}
+
+.three-col {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1200px) {
+  .two-col,
+  .three-col {
+    grid-template-columns: 1fr;
+  }
+}

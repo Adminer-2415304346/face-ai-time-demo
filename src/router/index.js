@@ -1,93 +1,56 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DemoShell from '@/components/layout/DemoShell.vue'
-import IntroScene from '@/views/demo/IntroScene.vue'
-import DatasetScene from '@/views/demo/DatasetScene.vue'
-import PreprocessScene from '@/views/demo/PreprocessScene.vue'
-import ModelScene from '@/views/demo/ModelScene.vue'
-import SystemDemoScene from '@/views/demo/SystemDemoScene.vue'
-import CrossTimeScene from '@/views/demo/CrossTimeScene.vue'
-import MetricsScene from '@/views/demo/MetricsScene.vue'
-import FailureScene from '@/views/demo/FailureScene.vue'
-import SummaryScene from '@/views/demo/SummaryScene.vue'
-
-const PlaceholderScene = {
-  template: `
-    <div style="padding: 24px;">
-      <h2 style="margin: 0 0 8px; font-size: 28px; color: #0f172a;">Coming Soon</h2>
-      <p style="margin: 0; color: #64748b; font-size: 14px;">
-        This scene is not implemented yet.
-      </p>
-    </div>
-  `
-}
+import DemoShell from '@/layouts/DemoShell.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/demo/intro'
-  },
-  {
-    path: '/demo',
     component: DemoShell,
+    redirect: '/recognition',
     children: [
       {
-        path: '',
-        redirect: '/demo/intro'
-      },
-      {
-        path: 'intro',
-        name: 'DemoIntro',
-        component: IntroScene
+        path: 'recognition',
+        name: 'RecognitionDemo',
+        component: () => import('@/pages/recognition/RecognitionDemoPage.vue'),
+        meta: { title: '智能识别演示' }
       },
       {
         path: 'dataset',
-        name: 'DemoDataset',
-        component: DatasetScene
-      },
-      {
-        path: 'preprocess',
-        name: 'DemoPreprocess',
-        component: PreprocessScene
-      },
-      {
-        path: 'model',
-        name: 'DemoModel',
-        component: ModelScene
-      },
-      {
-        path: 'system',
-        name: 'DemoSystem',
-        component: SystemDemoScene
-      },
-      {
-        path: 'cases',
-        name: 'DemoCases',
-        component: CrossTimeScene
-      },
-      {
-        path: 'metrics',
-        name: 'DemoMetrics',
-        component: MetricsScene
-      },
-      {
-        path: 'failures',
-        name: 'DemoFailures',
-        component: FailureScene
-      },
-      {
-        path: 'summary',
-        name: 'DemoSummary',
-        component: SummaryScene
+        name: 'DatasetShowcase',
+        component: () => import('@/pages/dataset/DatasetShowcasePage.vue'),
+        meta: { title: '数据资源展示' }
       }
     ]
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/demo/intro'
+    name: 'NotFound',
+    component: () => import('@/pages/not-found/NotFoundPage.vue')
   }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+        top: 96
+      }
+    }
+
+    return {
+      top: 0,
+      behavior: 'smooth'
+    }
+  }
 })
+
+router.afterEach((to) => {
+  document.title = to.meta?.title
+    ? `${to.meta.title} - 跨时间域生物面部识别系统`
+    : '跨时间域生物面部识别系统'
+})
+
+export default router
