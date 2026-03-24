@@ -42,8 +42,13 @@ defineProps({
 .timeline__image {
   width: 100%;
   height: 100px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 14px;
+  padding: 6px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.88), rgba(235, 241, 234, 0.96)),
+    #f5f8f3;
 }
 
 .timeline__year {

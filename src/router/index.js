@@ -14,6 +14,12 @@ const routes = [
         meta: { title: '智能识别演示' }
       },
       {
+        path: 'recognition/video',
+        name: 'RecognitionVideoDemo',
+        component: () => import('@/pages/recognition/RecognitionVideoDemoPage.vue'),
+        meta: { title: '视频识别演示' }
+      },
+      {
         path: 'dataset',
         name: 'DatasetShowcase',
         component: () => import('@/pages/dataset/DatasetShowcasePage.vue'),

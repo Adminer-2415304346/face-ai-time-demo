@@ -78,7 +78,11 @@ const mapStatus = (status) => {
   display: block;
   width: 100%;
   height: 180px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.88), rgba(235, 241, 234, 0.96)),
+    #f5f8f3;
 }
 
 .person-card__content {

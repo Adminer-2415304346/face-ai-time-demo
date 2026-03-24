@@ -4,7 +4,8 @@
     desc="展示当前样本的多候选匹配对象"
   >
     <div class="candidate-list">
-      <div v-for="item in list" :key="item.id" class="candidate-item">
+      <div v-for="(item, index) in list" :key="item.id" class="candidate-item">
+        <div class="candidate-item__rank">Top{{ index + 1 }}</div>
         <img :src="item.cover" class="candidate-item__cover" />
         <div class="candidate-item__content">
           <div class="candidate-item__name">{{ item.name }}</div>
@@ -31,41 +32,80 @@ defineProps({
 
 <style scoped lang="less">
 .candidate-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .candidate-item {
-  display: grid;
-  grid-template-columns: 84px 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px;
-  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+}
+
+.candidate-item__rank {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(126, 161, 138, 0.14);
+  color: #547761;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .candidate-item__cover {
-  width: 84px;
-  height: 64px;
-  border-radius: 14px;
-  object-fit: cover;
+  width: 100%;
+  height: 132px;
+  margin-top: 12px;
+  border-radius: 16px;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.88), rgba(235, 241, 234, 0.96)),
+    #f5f8f3;
+}
+
+.candidate-item__content {
+  margin-top: 14px;
+  min-width: 0;
 }
 
 .candidate-item__name {
+  font-size: 18px;
   font-weight: 700;
+  color: var(--demo-text-1);
 }
 
 .candidate-item__meta {
   margin-top: 6px;
   font-size: 13px;
+  line-height: 1.7;
   color: var(--demo-text-3);
 }
 
 .candidate-item__score {
-  font-size: 20px;
+  margin-top: 18px;
+  font-size: 28px;
   font-weight: 700;
+  line-height: 1;
   color: var(--demo-primary);
+}
+
+@media (max-width: 900px) {
+  .candidate-list {
+    grid-template-columns: 1fr;
+  }
+
+  .candidate-item {
+    min-width: 0;
+  }
+
+  .candidate-item__cover {
+    height: 120px;
+  }
 }
 </style>

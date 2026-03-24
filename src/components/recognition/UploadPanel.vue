@@ -1,7 +1,7 @@
 <template>
   <BaseCard
     title="上传与识别控制"
-    desc="选择个体库、识别模式并上传待识别图片"
+    desc="选择个体库、数据库与识别模式并上传待识别图片"
   >
     <div class="upload-panel">
       <a-upload-dragger :show-upload-list="false" class="upload-box">
@@ -16,6 +16,15 @@
             :options="subjectTypeOptions"
             block
             class="sage-segmented"
+          />
+        </a-form-item>
+
+        <a-form-item label="数据库选择">
+          <a-select
+            v-model:value="database"
+            :options="databaseOptions"
+            placeholder="请选择需要检索的数据库"
+            class="sage-select"
           />
         </a-form-item>
 
@@ -41,11 +50,19 @@ import { ref } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 
 const subjectType = ref('human')
+const database = ref('human-sequence-a')
 const recognitionMode = ref('auto')
 
 const subjectTypeOptions = [
   { label: '人类', value: 'human' },
   { label: '非人类', value: 'non-human' }
+]
+
+const databaseOptions = [
+  { label: '人类时序样本库 A', value: 'human-sequence-a' },
+  { label: '人类时序样本库 B', value: 'human-sequence-b' },
+  { label: '跨时期面部比对库', value: 'cross-period-face-db' },
+  { label: '非人类样本库', value: 'non-human-species-db' }
 ]
 </script>
 
@@ -120,6 +137,45 @@ const subjectTypeOptions = [
   box-shadow:
     0 8px 18px rgba(126, 161, 138, 0.16),
     inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.sage-select {
+  width: 100%;
+}
+
+.sage-select :deep(.ant-select-selector) {
+  min-height: 48px !important;
+  padding: 8px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: rgba(242, 245, 241, 0.95) !important;
+  box-shadow: inset 0 0 0 1px rgba(126, 161, 138, 0.08) !important;
+}
+
+.sage-select :deep(.ant-select-selection-item),
+.sage-select :deep(.ant-select-selection-placeholder) {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--demo-text-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sage-select :deep(.ant-select-selection-placeholder) {
+  color: var(--demo-text-3);
+  font-weight: 500;
+}
+
+.sage-select :deep(.ant-select-arrow) {
+  color: var(--demo-text-2);
+}
+
+.sage-select :deep(.ant-select-focused .ant-select-selector),
+.sage-select :deep(.ant-select-open .ant-select-selector) {
+  box-shadow:
+    inset 0 0 0 1px rgba(126, 161, 138, 0.18),
+    0 8px 18px rgba(126, 161, 138, 0.12) !important;
 }
 
 .sage-radio-group {

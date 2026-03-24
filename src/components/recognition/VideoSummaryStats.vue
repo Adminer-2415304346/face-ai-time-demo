@@ -5,6 +5,7 @@
       :key="item.label"
       :label="item.label"
       :value="item.value"
+      :extra="item.extra"
     />
   </div>
 </template>
@@ -30,6 +31,12 @@ defineProps({
 @media (max-width: 1200px) {
   .video-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .video-stats {
+    grid-template-columns: 1fr;
   }
 }
 </style>

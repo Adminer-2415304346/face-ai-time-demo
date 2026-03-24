@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="demo-shell" :class="{ 'is-collapsed': isCollapsed }">
     <aside class="demo-shell__sider glass-panel" :class="{ 'is-collapsed': isCollapsed }">
       <div class="brand" :class="{ 'is-collapsed': isCollapsed }">
@@ -53,7 +53,7 @@
       <header class="demo-shell__header glass-panel">
         <div>
           <div class="header-title">{{ currentTitle }}</div>
-          <div class="header-desc">面向演示答辩场景的多模态展示前端</div>
+          <div class="header-desc">{{ currentDesc }}</div>
         </div>
       </header>
 
@@ -74,8 +74,8 @@ import {
   FilterOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  PictureOutlined,
   PlayCircleOutlined,
+  PictureOutlined,
   RadarChartOutlined,
   TeamOutlined
 } from '@ant-design/icons-vue'
@@ -96,16 +96,9 @@ const menus = [
         icon: PictureOutlined
       },
       {
-        path: '/recognition',
-        hash: '#recognition-video',
-        label: '视频识别',
+        path: '/recognition/video',
+        label: '视频演示',
         icon: PlayCircleOutlined
-      },
-      {
-        path: '/recognition',
-        hash: '#recognition-analysis',
-        label: '结果分析',
-        icon: BarChartOutlined
       }
     ]
   },
@@ -143,11 +136,33 @@ const menus = [
 ]
 
 const currentTitle = computed(() => {
+  if (route.path.startsWith('/recognition')) {
+    return '智能识别演示'
+  }
+
   return route.meta?.title || '系统展示'
 })
 
-const isGroupActive = (group) => route.path === group.path
-const isChildActive = (child) => route.path === child.path && route.hash === child.hash
+const currentDesc = computed(() => {
+  if (route.path === '/dataset') {
+    return '展示数据库概览、筛选能力、个体样本卡片和典型跨时间案例。'
+  }
+
+  if (route.path.startsWith('/recognition')) {
+    return '面向演示答辩场景的多模态展示前端'
+  }
+
+  return '系统展示页面'
+})
+
+const isGroupActive = (group) => route.path.startsWith(group.path)
+const isChildActive = (child) => {
+  if (child.hash) {
+    return route.path === child.path && route.hash === child.hash
+  }
+
+  return route.path === child.path
+}
 </script>
 
 <style scoped lang="less">
@@ -383,3 +398,5 @@ const isChildActive = (child) => route.path === child.path && route.hash === chi
   }
 }
 </style>
+
+

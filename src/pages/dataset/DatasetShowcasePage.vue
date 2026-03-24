@@ -1,22 +1,16 @@
 <template>
   <div class="page-container">
-    <SectionHeader
-      title="数据资源展示"
-      desc="展示数据库概览、筛选能力、个体样本卡片和典型跨时期案例。"
-    >
-      <template #extra>
-        <a-button class="page-reset-btn" @click="handleReset">重置筛选</a-button>
-      </template>
-    </SectionHeader>
-
     <div id="dataset-filter">
       <DatasetFilterBar
         :keyword="filters.keyword"
         :type="filters.type"
+        :library="filters.library"
         :date-range="filters.dateRange"
         @search="handleSearch"
         @type-change="handleTypeChange"
+        @library-change="handleLibraryChange"
         @date-change="handleDateChange"
+        @reset="handleReset"
         @refresh="handleRefresh"
       />
     </div>
@@ -27,9 +21,10 @@
 
     <div id="dataset-cases" class="section-grid dataset-top-grid">
       <PeriodDistributionChart
-  :year-data="periodYearDistributionMock"
-  :type-data="typeDistributionMock"
-/>
+        :year-data="periodYearDistributionMock"
+        :type-data="typeDistributionMock"
+        :stage-data="ageStageDistributionMock"
+      />
 
       <TypicalCaseGallery :list="caseList" />
     </div>
@@ -85,11 +80,11 @@
 
           <BaseCard
             title="样本说明"
-            desc="这里可以继续补充个体简介、来源说明、标签、备注等信息。"
+            desc="这里可以继续补充个体简介、来源说明、标签和备注等信息。"
           >
             <div class="detail-desc">
-              当前个体已纳入数据资源展示页，可继续扩展：
-              全时期照片墙、时间轴、年龄阶段、样本备注、来源信息等内容。
+              当前个体已纳入数据资源展示页，可继续扩展全时期照片墙、时间轴、年龄阶段、
+              样本备注和来源信息等内容。
             </div>
           </BaseCard>
         </div>
@@ -106,7 +101,6 @@
 import { computed, ref } from 'vue'
 import { message } from 'ant-design-vue'
 
-import SectionHeader from '@/components/common/SectionHeader.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import StatusTag from '@/components/common/StatusTag.vue'
 
@@ -114,7 +108,6 @@ import DatasetFilterBar from '@/components/dataset/DatasetFilterBar.vue'
 import OverviewStats from '@/components/dataset/OverviewStats.vue'
 import TypicalCaseGallery from '@/components/dataset/TypicalCaseGallery.vue'
 import IndividualCardList from '@/components/dataset/IndividualCardList.vue'
-
 import PeriodDistributionChart from '@/components/dataset/PeriodDistributionChart.vue'
 
 import {
@@ -122,12 +115,14 @@ import {
   individualListMock,
   typicalCaseListMock,
   periodYearDistributionMock,
-  typeDistributionMock
+  typeDistributionMock,
+  ageStageDistributionMock
 } from '@/mock/dataset'
 
 const filters = ref({
   keyword: '',
   type: '全部',
+  library: 'all',
   dateRange: []
 })
 
@@ -168,10 +163,15 @@ const handleDateChange = (dateRange) => {
   filters.value.dateRange = dateRange || []
 }
 
+const handleLibraryChange = (library) => {
+  filters.value.library = library || 'all'
+}
+
 const handleReset = () => {
   filters.value = {
     keyword: '',
     type: '全部',
+    library: 'all',
     dateRange: []
   }
   message.success('已重置筛选条件')
@@ -200,14 +200,9 @@ const mapStatusText = (status) => {
 </script>
 
 <style scoped lang="less">
-.page-reset-btn {
-  color: var(--demo-primary);
-  border-color: rgba(126, 161, 138, 0.72);
-}
-
-.page-reset-btn:hover {
-  color: #6f8f7a !important;
-  border-color: #6f8f7a !important;
+#dataset-filter {
+  position: relative;
+  z-index: 20;
 }
 
 .dataset-top-grid {
@@ -269,8 +264,13 @@ const mapStatusText = (status) => {
 .detail-panel__cover {
   width: 100%;
   height: 220px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 20px;
+  padding: 10px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.88), rgba(235, 241, 234, 0.96)),
+    #f5f8f3;
 }
 
 .detail-panel__header {

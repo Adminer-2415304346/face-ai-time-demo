@@ -1,76 +1,152 @@
 export const datasetStatsMock = [
-  { label: '个体总数', value: 248, extra: '覆盖双库资源' },
-  { label: '图片总数', value: 9652, extra: '含历史时期样本' },
-  { label: '时间跨度', value: '12年', extra: '2013 - 2025' },
-  { label: '近期更新', value: 86, extra: '近30天新增' }
+  {
+    label: '个体总数',
+    value: '2506',
+    extra: '基于本地 images 数据集统计'
+  },
+  {
+    label: '图片总数',
+    value: '13120',
+    extra: '覆盖 train / val / test 三个子集'
+  },
+  {
+    label: '时间跨度',
+    value: '6 年',
+    extra: '2017 - 2022'
+  },
+  {
+    label: '跨期个体',
+    value: '34',
+    extra: '可用于跨时间展示筛选'
+  }
 ]
 
 export const individualListMock = [
   {
-    id: 'A-1024',
-    name: '个体 A-1024',
-    type: '人类',
-    sampleCount: 38,
-    periodCount: 4,
-    latestUpdate: '2025-01-12',
-    status: 'complete',
-    cover: 'https://dummyimage.com/240x160/e7eee4/6f8d7d&text=A-1024'
-  },
-  {
-    id: 'N-2041',
-    name: '个体 N-2041',
+    id: 'ID-001',
+    name: 'Hotlips',
     type: '非人类',
-    sampleCount: 16,
-    periodCount: 3,
-    latestUpdate: '2024-11-06',
-    status: 'pending',
-    cover: 'https://dummyimage.com/240x160/e7eee4/6f8d7d&text=N-2041'
+    sampleCount: 318,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/hotlips.jpg'
   },
   {
-    id: 'A-0882',
-    name: '个体 A-0882',
-    type: '人类',
-    sampleCount: 9,
-    periodCount: 2,
-    latestUpdate: '2024-08-19',
-    status: 'insufficient',
-    cover: 'https://dummyimage.com/240x160/e7eee4/6f8d7d&text=A-0882'
+    id: 'ID-002',
+    name: 'Rocky',
+    type: '非人类',
+    sampleCount: 290,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/rocky.jpg'
+  },
+  {
+    id: 'ID-003',
+    name: 'Sloth',
+    type: '非人类',
+    sampleCount: 277,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/sloth.jpg'
+  },
+  {
+    id: 'ID-004',
+    name: 'Pintail',
+    type: '非人类',
+    sampleCount: 237,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/pintail.jpg'
+  },
+  {
+    id: 'ID-005',
+    name: 'Seuss',
+    type: '非人类',
+    sampleCount: 235,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/seuss.jpg'
+  },
+  {
+    id: 'ID-006',
+    name: 'Crease',
+    type: '非人类',
+    sampleCount: 224,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/crease.jpg'
+  },
+  {
+    id: 'ID-007',
+    name: 'Chops',
+    type: '非人类',
+    sampleCount: 220,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/chops.jpg'
+  },
+  {
+    id: 'ID-008',
+    name: 'Aardvark',
+    type: '非人类',
+    sampleCount: 214,
+    periodCount: 6,
+    latestUpdate: '2022-12-31',
+    status: 'complete',
+    cover: '/images/demo/dataset/individuals/aardvark.jpg'
   }
 ]
 
 export const typicalCaseListMock = [
   {
-    id: 'case-1',
-    title: '典型个体案例 1',
-    desc: '展示不同年份下的外观变化与识别连续性。',
-    image: 'https://dummyimage.com/280x180/e7eee4/6f8d7d&text=Case+1'
+    id: 'case-hotlips',
+    title: 'Hotlips 跨时期案例',
+    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，可用于展示跨时间外观变化与匹配稳定性。',
+    periodCount: 6,
+    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    image: '/images/demo/dataset/cases/hotlips.jpg'
   },
   {
-    id: 'case-2',
-    title: '典型个体案例 2',
-    desc: '适用于答辩演示的跨时期样本变化说明。',
-    image: 'https://dummyimage.com/280x180/e7eee4/6f8d7d&text=Case+2'
+    id: 'case-rocky',
+    title: 'Rocky 跨时期案例',
+    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，适合讲解长期跟踪与特征保持。',
+    periodCount: 6,
+    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    image: '/images/demo/dataset/cases/rocky.jpg'
   },
   {
-    id: 'case-3',
-    title: '典型个体案例 3',
-    desc: '突出长期样本连续追踪和识别稳定性。',
-    image: 'https://dummyimage.com/280x180/e7eee4/6f8d7d&text=Case+3'
+    id: 'case-sloth',
+    title: 'Sloth 跨时期案例',
+    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，可用于展示样本质量差异下的跨时期检索。',
+    periodCount: 6,
+    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    image: '/images/demo/dataset/cases/sloth.jpg'
   }
 ]
 
 export const periodYearDistributionMock = [
-  { year: '2018', value: 42 },
-  { year: '2019', value: 58 },
-  { year: '2020', value: 76 },
-  { year: '2021', value: 64 },
-  { year: '2022', value: 92 },
-  { year: '2023', value: 108 },
-  { year: '2024', value: 87 },
-  { year: '2025', value: 66 }
+  { year: '2017', value: 874 },
+  { year: '2018', value: 1310 },
+  { year: '2019', value: 1842 },
+  { year: '2020', value: 1799 },
+  { year: '2021', value: 3021 },
+  { year: '2022', value: 2722 }
 ]
 
 export const typeDistributionMock = [
-  { name: '人类', value: 162 },
-  { name: '非人类', value: 86 }
+  { name: '非人类', value: 2506 }
+]
+
+export const ageStageDistributionMock = [
+  { name: '幼年期', value: 312 },
+  { name: '成长期', value: 746 },
+  { name: '成熟期', value: 1084 },
+  { name: '稳定期', value: 364 }
 ]
