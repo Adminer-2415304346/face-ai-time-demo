@@ -3,7 +3,7 @@
     title="个体聚类结果"
     desc="展示视频中检测到的个体分组及其匹配状态。"
   >
-    <div class="group-list">
+    <div v-if="list.length" class="group-list">
       <div v-for="item in list" :key="item.id" class="group-item">
         <img :src="item.cover" :alt="item.name" class="group-item__cover" />
 
@@ -16,18 +16,32 @@
         <StatusTag :status="mapStatus(item.status).status" :text="mapStatus(item.status).text" />
       </div>
     </div>
+    <div v-else class="group-empty">{{ emptyText }}</div>
   </BaseCard>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import StatusTag from '@/components/common/StatusTag.vue'
 
-defineProps({
+const props = defineProps({
   list: {
     type: Array,
     default: () => []
+  },
+  mode: {
+    type: String,
+    default: 'idle'
   }
+})
+
+const emptyText = computed(() => {
+  if (props.mode === 'rejected') {
+    return '当前视频已拒识，不展示个体聚类与匹配分组。'
+  }
+
+  return '上传视频后，这里会展示个体聚类与匹配状态。'
 })
 
 const mapStatus = (status) => {
@@ -48,6 +62,14 @@ const mapStatus = (status) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.group-empty {
+  padding: 24px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.38);
+  color: var(--demo-text-3);
+  text-align: center;
 }
 
 .group-item {

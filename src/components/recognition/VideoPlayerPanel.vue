@@ -4,30 +4,56 @@
     desc="模拟视频流播放、关键帧抽取与跨时间个体追踪结果。"
   >
     <div class="video-player">
-      <img :src="cover" :alt="title" class="video-player__cover" />
+      <video
+        v-if="videoUrl"
+        :src="videoUrl"
+        :poster="cover"
+        :title="title"
+        class="video-player__cover"
+        controls
+      />
+      <div v-else class="video-player__empty">
+        <div class="video-player__empty-title">等待上传识别视频</div>
+        <div class="video-player__empty-desc">
+          上传视频后，这里会显示本地预览，并联动下方的视频识别演示结果。
+        </div>
+      </div>
 
       <div class="video-player__mask">
-        <div class="video-player__status">
+        <div class="video-player__status" :class="`is-${statusType}`">
           <span class="video-player__dot" />
-          视频流演示中
+          {{ statusText }}
         </div>
 
-        <button type="button" class="video-player__action">
+        <button type="button" class="video-player__action" @click="triggerUpload">
           <span class="video-player__action-icon">
-            <span class="video-player__triangle" />
+            <span :class="actionIconClass" />
           </span>
-          <span>{{ actionText }}</span>
+          <span>{{ computedActionText }}</span>
         </button>
       </div>
+
+      <input
+        ref="fileInputRef"
+        type="file"
+        accept="video/*"
+        class="video-player__input"
+        @change="handleFileChange"
+      />
     </div>
   </BaseCard>
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 
-defineProps({
+const props = defineProps({
   cover: {
+    type: String,
+    default: ''
+  },
+  videoUrl: {
     type: String,
     default: ''
   },
@@ -38,8 +64,50 @@ defineProps({
   actionText: {
     type: String,
     default: '播放演示'
+  },
+  statusText: {
+    type: String,
+    default: ''
+  },
+  statusType: {
+    type: String,
+    default: 'normal'
+  },
+  uploaded: {
+    type: Boolean,
+    default: false
   }
 })
+
+const emit = defineEmits(['file-select'])
+const fileInputRef = ref(null)
+
+const computedActionText = computed(() => (
+  props.uploaded ? props.actionText || '重新上传视频' : '上传视频'
+))
+
+const statusText = computed(() => (
+  props.statusText || (props.uploaded ? '已加载本地视频' : '等待上传视频')
+))
+
+const actionIconClass = computed(() => (
+  props.uploaded ? 'video-player__upload-icon' : 'video-player__upload-icon'
+))
+
+const triggerUpload = () => {
+  fileInputRef.value?.click()
+}
+
+const handleFileChange = (event) => {
+  const [file] = event.target.files || []
+
+  if (!file) {
+    return
+  }
+
+  emit('file-select', file)
+  event.target.value = ''
+}
 </script>
 
 <style scoped lang="less">
@@ -59,6 +127,33 @@ defineProps({
   display: block;
   object-fit: cover;
   object-position: center;
+}
+
+.video-player__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 420px;
+  padding: 24px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.4), transparent 32%),
+    linear-gradient(180deg, rgba(229, 237, 227, 0.92), rgba(239, 244, 236, 0.98));
+}
+
+.video-player__empty-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--demo-text-1);
+}
+
+.video-player__empty-desc {
+  max-width: 420px;
+  color: var(--demo-text-3);
+  line-height: 1.8;
 }
 
 .video-player__mask {
@@ -88,12 +183,23 @@ defineProps({
   box-shadow: 0 12px 24px rgba(52, 79, 64, 0.14);
 }
 
+.video-player__status.is-reject {
+  background: rgba(255, 245, 245, 0.92);
+  color: #9f4646;
+  box-shadow: 0 12px 24px rgba(159, 70, 70, 0.16);
+}
+
 .video-player__dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #7ea18a;
   box-shadow: 0 0 0 6px rgba(126, 161, 138, 0.14);
+}
+
+.video-player__status.is-reject .video-player__dot {
+  background: #c46363;
+  box-shadow: 0 0 0 6px rgba(196, 99, 99, 0.16);
 }
 
 .video-player__action {
@@ -135,11 +241,38 @@ defineProps({
 }
 
 .video-player__triangle {
-  width: 0;
-  height: 0;
-  margin-left: 2px;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-  border-left: 9px solid #5f8170;
+  display: none;
+}
+
+.video-player__upload-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.video-player__upload-icon::before,
+.video-player__upload-icon::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #5f8170;
+  border-radius: 999px;
+}
+
+.video-player__upload-icon::before {
+  top: 1px;
+  width: 3px;
+  height: 9px;
+}
+
+.video-player__upload-icon::after {
+  bottom: 1px;
+  width: 12px;
+  height: 3px;
+}
+
+.video-player__input {
+  display: none;
 }
 </style>
