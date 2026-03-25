@@ -4,9 +4,24 @@
     desc="选择个体库、数据库与识别模式并上传待识别图片"
   >
     <div class="upload-panel">
-      <a-upload-dragger :show-upload-list="false" class="upload-box">
-        <p class="upload-box__text">点击或拖拽上传图片</p>
-        <p class="upload-box__sub">支持 JPG / PNG，建议使用清晰正脸样本</p>
+      <a-upload-dragger
+        :show-upload-list="false"
+        :before-upload="handleBeforeUpload"
+        accept=".jpg,.jpeg,.png"
+        class="upload-box"
+      >
+        <div v-if="previewUrl" class="upload-preview">
+          <img :src="previewUrl" :alt="previewName" class="upload-preview__image" />
+          <div class="upload-preview__meta">
+            <p class="upload-preview__name">{{ previewName }}</p>
+            <p class="upload-preview__sub">已完成本地预览，尚未上传到服务器</p>
+          </div>
+        </div>
+
+        <template v-else>
+          <p class="upload-box__text">点击或拖拽上传图片</p>
+          <p class="upload-box__sub">支持 JPG / PNG，建议使用清晰正脸样本</p>
+        </template>
       </a-upload-dragger>
 
       <a-form layout="vertical" class="control-form">
@@ -36,8 +51,10 @@
         </a-form-item>
 
         <div class="actions">
-          <a-button type="primary" class="action-btn action-btn--primary">开始识别</a-button>
-          <a-button class="action-btn action-btn--secondary">重置</a-button>
+          <a-button type="primary" class="action-btn action-btn--primary" @click="handleRecognize">
+            开始识别
+          </a-button>
+          <a-button class="action-btn action-btn--secondary" @click="handleReset">重置</a-button>
         </div>
       </a-form>
     </div>
@@ -45,13 +62,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
+import { message } from 'ant-design-vue'
 
 import BaseCard from '@/components/common/BaseCard.vue'
+
+const emit = defineEmits(['recognize', 'reset'])
 
 const subjectType = ref('human')
 const database = ref('human-sequence-a')
 const recognitionMode = ref('auto')
+const previewUrl = ref('')
+const previewName = ref('')
+const selectedFile = ref(null)
 
 const subjectTypeOptions = [
   { label: '人类', value: 'human' },
@@ -64,6 +87,58 @@ const databaseOptions = [
   { label: '跨时期面部比对库', value: 'cross-period-face-db' },
   { label: '非人类样本库', value: 'non-human-species-db' }
 ]
+
+const allowedImageTypes = new Set(['image/jpeg', 'image/png'])
+
+const revokePreviewUrl = () => {
+  if (!previewUrl.value) {
+    return
+  }
+
+  URL.revokeObjectURL(previewUrl.value)
+  previewUrl.value = ''
+}
+
+const handleBeforeUpload = (file) => {
+  if (!allowedImageTypes.has(file.type)) {
+    message.warning('请上传 JPG 或 PNG 格式图片')
+    return false
+  }
+
+  revokePreviewUrl()
+  previewUrl.value = URL.createObjectURL(file)
+  previewName.value = file.name
+  selectedFile.value = file
+
+  return false
+}
+
+const handleRecognize = () => {
+  if (!selectedFile.value || !previewUrl.value) {
+    message.warning('请先选择一张待识别图片')
+    return
+  }
+
+  emit('recognize', {
+    file: selectedFile.value,
+    previewUrl: previewUrl.value,
+    previewName: previewName.value,
+    subjectType: subjectType.value,
+    database: database.value,
+    recognitionMode: recognitionMode.value
+  })
+}
+
+const handleReset = () => {
+  revokePreviewUrl()
+  previewName.value = ''
+  selectedFile.value = null
+  emit('reset')
+}
+
+onBeforeUnmount(() => {
+  revokePreviewUrl()
+})
 </script>
 
 <style scoped lang="less">
@@ -77,6 +152,37 @@ const databaseOptions = [
   overflow: hidden;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.35);
+}
+
+.upload-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.upload-preview__image {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: rgba(242, 245, 241, 0.75);
+}
+
+.upload-preview__meta {
+  text-align: left;
+}
+
+.upload-preview__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--demo-text-1);
+}
+
+.upload-preview__sub {
+  margin: 4px 0 0;
+  color: var(--demo-text-3);
 }
 
 .upload-box__text {

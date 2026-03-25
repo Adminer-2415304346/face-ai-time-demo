@@ -2,19 +2,19 @@
   <div class="page-container">
     <BaseCard id="recognition-image" class="recognition-stage">
       <div class="section-grid two-col" id="recognition-analysis">
-        <UploadPanel />
+        <UploadPanel @recognize="handleRecognize" @reset="handleReset" />
 
         <div class="section-grid recognition-result-stack">
           <RecognitionOverviewCard
-            :result="recognitionMock.result"
-            :info="recognitionMock.result.identityInfo"
+            :result="currentRecognition.result"
+            :info="currentRecognition.result.identityInfo"
           />
 
-          <CandidateList :list="recognitionMock.result.candidates" />
+          <CandidateList :list="currentRecognition.result.candidates" />
 
           <div class="section-grid recognition-bottom-grid">
-            <TimeTimeline :list="recognitionMock.result.timeline" />
-            <RejectReasonPanel :status="recognitionMock.result.status" />
+            <TimeTimeline :list="currentRecognition.result.timeline" />
+            <RejectReasonPanel :status="currentRecognition.result.status" />
           </div>
         </div>
       </div>
@@ -23,6 +23,8 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 import BaseCard from '@/components/common/BaseCard.vue'
 
 import UploadPanel from '@/components/recognition/UploadPanel.vue'
@@ -31,7 +33,36 @@ import CandidateList from '@/components/recognition/CandidateList.vue'
 import TimeTimeline from '@/components/recognition/TimeTimeline.vue'
 import RejectReasonPanel from '@/components/recognition/RejectReasonPanel.vue'
 
-import { recognitionMock } from '@/mock/recognition'
+import {
+  createUnknownRecognitionResult,
+  recognitionCases,
+  recognitionMock
+} from '@/mock/recognition'
+
+const currentRecognition = ref(structuredClone(recognitionMock))
+
+const normalizeFileName = (fileName = '') => fileName.trim().toLowerCase()
+
+const cloneRecognitionPayload = (payload) => structuredClone(payload)
+
+const handleRecognize = ({ previewUrl, previewName }) => {
+  const fileName = normalizeFileName(previewName)
+  const matchedPayload = recognitionCases[fileName]
+
+  if (matchedPayload) {
+    const nextRecognition = cloneRecognitionPayload(matchedPayload)
+
+    nextRecognition.result.target.cover = previewUrl
+    currentRecognition.value = nextRecognition
+    return
+  }
+
+  currentRecognition.value = createUnknownRecognitionResult(previewUrl, previewName)
+}
+
+const handleReset = () => {
+  currentRecognition.value = cloneRecognitionPayload(recognitionMock)
+}
 </script>
 
 <style scoped lang="less">

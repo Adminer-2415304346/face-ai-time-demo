@@ -3,13 +3,14 @@
     title="跨时间样本时间轴"
     desc="展示同一个体在不同时期的代表样本"
   >
-    <div class="timeline">
+    <div v-if="list.length" class="timeline">
       <div v-for="item in list" :key="item.id" class="timeline__item">
         <img :src="item.image" class="timeline__image" />
         <div class="timeline__year">{{ item.year }}</div>
         <div class="timeline__label">{{ item.label }}</div>
       </div>
     </div>
+    <div v-else class="timeline-empty">当前样本没有可展示的跨时期时间轴数据。</div>
   </BaseCard>
 </template>
 
@@ -30,6 +31,14 @@ defineProps({
   gap: 14px;
   overflow-x: auto;
   padding-bottom: 8px;
+}
+
+.timeline-empty {
+  padding: 24px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.38);
+  color: var(--demo-text-3);
+  text-align: center;
 }
 
 .timeline__item {
