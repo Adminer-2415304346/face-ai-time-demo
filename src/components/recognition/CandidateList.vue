@@ -10,13 +10,13 @@
         <div class="candidate-item__content">
           <div class="candidate-item__name">{{ item.name }}</div>
           <div class="candidate-item__meta">
-            {{ item.code }} · 最近样本 {{ item.latestYear }}
+            {{ item.code }} · 参考时期 {{ item.latestYear }}
           </div>
         </div>
         <div class="candidate-item__score">{{ item.confidence }}%</div>
       </div>
     </div>
-    <div v-else class="candidate-empty">当前结果没有可展示的候选对象。</div>
+    <div v-else class="candidate-empty">上传图片并开始识别后，这里会展示候选匹配对象。</div>
   </BaseCard>
 </template>
 

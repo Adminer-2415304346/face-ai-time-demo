@@ -73,7 +73,7 @@
               <div class="detail-item__value">{{ currentIndividual.periodCount }}</div>
             </div>
             <div class="detail-item">
-              <div class="detail-item__label">最近更新</div>
+              <div class="detail-item__label">参考时期</div>
               <div class="detail-item__value">{{ currentIndividual.latestUpdate }}</div>
             </div>
           </div>

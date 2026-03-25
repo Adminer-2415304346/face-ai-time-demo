@@ -10,7 +10,7 @@
         <div class="timeline__label">{{ item.label }}</div>
       </div>
     </div>
-    <div v-else class="timeline-empty">当前样本没有可展示的跨时期时间轴数据。</div>
+    <div v-else class="timeline-empty">上传图片并开始识别后，这里会展示跨时间样本时间轴。</div>
   </BaseCard>
 </template>
 

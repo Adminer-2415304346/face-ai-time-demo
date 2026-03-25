@@ -6,17 +6,17 @@ export const datasetStatsMock = [
   },
   {
     label: '图片总数',
-    value: '13120',
-    extra: '覆盖 train / val / test 三个子集'
+    value: '5825',
+    extra: '覆盖历史时期样本子集'
   },
   {
     label: '时间跨度',
-    value: '6 年',
-    extra: '2017 - 2022'
+    value: '4 年',
+    extra: '2017 - 2020'
   },
   {
     label: '跨期个体',
-    value: '34',
+    value: '22',
     extra: '可用于跨时间展示筛选'
   }
 ]
@@ -27,8 +27,8 @@ export const individualListMock = [
     name: 'Hotlips',
     type: '非人类',
     sampleCount: 318,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2020',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/hotlips.jpg'
   },
@@ -37,8 +37,8 @@ export const individualListMock = [
     name: 'Rocky',
     type: '非人类',
     sampleCount: 290,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2020',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/rocky.jpg'
   },
@@ -47,8 +47,8 @@ export const individualListMock = [
     name: 'Sloth',
     type: '非人类',
     sampleCount: 277,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2020',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/sloth.jpg'
   },
@@ -57,8 +57,8 @@ export const individualListMock = [
     name: 'Pintail',
     type: '非人类',
     sampleCount: 237,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2019',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/pintail.jpg'
   },
@@ -67,8 +67,8 @@ export const individualListMock = [
     name: 'Seuss',
     type: '非人类',
     sampleCount: 235,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2020',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/seuss.jpg'
   },
@@ -77,8 +77,8 @@ export const individualListMock = [
     name: 'Crease',
     type: '非人类',
     sampleCount: 224,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2019',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/crease.jpg'
   },
@@ -87,8 +87,8 @@ export const individualListMock = [
     name: 'Chops',
     type: '非人类',
     sampleCount: 220,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2020',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/chops.jpg'
   },
@@ -97,8 +97,8 @@ export const individualListMock = [
     name: 'Aardvark',
     type: '非人类',
     sampleCount: 214,
-    periodCount: 6,
-    latestUpdate: '2022-12-31',
+    periodCount: 4,
+    latestUpdate: '2019',
     status: 'complete',
     cover: '/images/demo/dataset/individuals/aardvark.jpg'
   }
@@ -108,25 +108,25 @@ export const typicalCaseListMock = [
   {
     id: 'case-hotlips',
     title: 'Hotlips 跨时期案例',
-    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，可用于展示跨时间外观变化与匹配稳定性。',
-    periodCount: 6,
-    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    desc: '覆盖 2017 至 2020 年，共 4 个时期样本，可用于展示跨时间外观变化与匹配稳定性。',
+    periodCount: 4,
+    years: ['2017', '2018', '2019', '2020'],
     image: '/images/demo/dataset/cases/hotlips.jpg'
   },
   {
     id: 'case-rocky',
     title: 'Rocky 跨时期案例',
-    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，适合讲解长期跟踪与特征保持。',
-    periodCount: 6,
-    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    desc: '覆盖 2017 至 2020 年，共 4 个时期样本，适合讲解长期跟踪与特征保持。',
+    periodCount: 4,
+    years: ['2017', '2018', '2019', '2020'],
     image: '/images/demo/dataset/cases/rocky.jpg'
   },
   {
     id: 'case-sloth',
     title: 'Sloth 跨时期案例',
-    desc: '覆盖 2017 至 2022 年，共 6 个时期样本，可用于展示样本质量差异下的跨时期检索。',
-    periodCount: 6,
-    years: ['2017', '2018', '2019', '2020', '2021', '2022'],
+    desc: '覆盖 2017 至 2020 年，共 4 个时期样本，可用于展示样本质量差异下的跨时期检索。',
+    periodCount: 4,
+    years: ['2017', '2018', '2019', '2020'],
     image: '/images/demo/dataset/cases/sloth.jpg'
   }
 ]
@@ -135,9 +135,7 @@ export const periodYearDistributionMock = [
   { year: '2017', value: 874 },
   { year: '2018', value: 1310 },
   { year: '2019', value: 1842 },
-  { year: '2020', value: 1799 },
-  { year: '2021', value: 3021 },
-  { year: '2022', value: 2722 }
+  { year: '2020', value: 1799 }
 ]
 
 export const typeDistributionMock = [

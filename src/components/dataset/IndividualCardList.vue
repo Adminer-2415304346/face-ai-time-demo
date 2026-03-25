@@ -19,7 +19,7 @@
           <div class="person-card__meta">类型：{{ item.type }}</div>
           <div class="person-card__meta">样本数：{{ item.sampleCount }}</div>
           <div class="person-card__meta">时期数：{{ item.periodCount }}</div>
-          <div class="person-card__meta">最近更新：{{ item.latestUpdate }}</div>
+          <div class="person-card__meta">参考时期：{{ item.latestUpdate }}</div>
 
           <div class="person-card__actions">
             <a-button type="link" class="person-card__link">查看详情</a-button>

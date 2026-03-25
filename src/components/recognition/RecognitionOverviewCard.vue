@@ -1,14 +1,24 @@
 <template>
   <BaseCard
     title="识别结果总览"
-    desc="当前样本的主匹配结果、年龄预测与身份信息说明"
+    desc="当前样本的主匹配结果、预测 ΔT 与身份信息说明"
     class="recognition-overview-card"
   >
     <div class="overview-shell glass-block">
       <div class="overview-layout">
         <div class="overview-main">
           <div class="overview-main__media">
-            <img :src="result.target?.cover" class="overview-main__cover" />
+            <div v-if="result.status === 'rejected'" class="overview-main__alert">
+              <div class="overview-main__alert-title">库外个体，拒绝识别</div>
+              <div class="overview-main__alert-desc">
+                当前上传图片未匹配到库内已登记个体，系统不会展示主匹配结果预览。
+              </div>
+              <div class="overview-main__alert-badge">REJECTED</div>
+            </div>
+            <img v-else-if="result.target?.cover" :src="result.target.cover" class="overview-main__cover" />
+            <div v-else class="overview-main__empty">
+              上传图片后，这里会显示主匹配结果预览
+            </div>
             <div class="overview-main__media-mask"></div>
           </div>
 
@@ -31,7 +41,7 @@
               <div class="overview-main__score-block">
                 <div class="overview-main__score-label">识别置信度</div>
                 <div class="overview-main__score">
-                  {{ result.confidence ?? '--' }}%
+                  {{ confidenceText }}
                 </div>
               </div>
 
@@ -47,14 +57,14 @@
 
         <div class="overview-side">
           <div class="overview-panel">
-            <div class="block-title">年龄预测</div>
-            <div class="block-desc">基于当前样本进行年龄与阶段判断</div>
+            <div class="block-title">预测 ΔT</div>
+            <div class="block-desc">显示当前上传样本与参考时期之间的时间间隔</div>
 
             <div class="overview-age__value-row">
               <div class="overview-age__value">
-                {{ result.predictedAge ?? '--' }}
+                {{ deltaTText }}
               </div>
-              <div class="overview-age__unit">岁</div>
+              <div v-if="showDeltaTUnit" class="overview-age__unit">年</div>
             </div>
 
             <div class="overview-age__stage">
@@ -62,7 +72,7 @@
             </div>
 
             <div class="overview-age__text">
-              结合跨时期样本，当前个体表现为稳定阶段特征。
+              {{ deltaTDescription }}
             </div>
           </div>
 
@@ -130,6 +140,13 @@ const statusConfig = computed(() => {
     }
   }
 
+  if (status === 'idle') {
+    return {
+      status: 'info',
+      text: '等待识别'
+    }
+  }
+
   return {
     status: 'info',
     text: '识别结果'
@@ -148,10 +165,44 @@ const summaryText = computed(() => {
   }
 
   if (status === 'rejected') {
-    return '当前样本未形成有效匹配，可检查遮挡、角度或样本质量。'
+    return '当前上传图片未匹配到库内已登记个体，系统已执行拒绝识别。'
+  }
+
+  if (status === 'idle') {
+    return '当前还没有识别结果，请先在左侧上传图片并开始识别。'
   }
 
   return '当前展示识别结果摘要信息。'
+})
+
+const confidenceText = computed(() => {
+  if (props.result?.confidence === null || props.result?.confidence === undefined) {
+    return '--'
+  }
+
+  return `${props.result.confidence}%`
+})
+
+const deltaTText = computed(() => {
+  if (props.result?.predictedDeltaT === null || props.result?.predictedDeltaT === undefined) {
+    return '--'
+  }
+
+  return props.result.predictedDeltaT
+})
+
+const showDeltaTUnit = computed(() => deltaTText.value !== '--')
+
+const deltaTDescription = computed(() => {
+  if (props.result?.status === 'idle') {
+    return '上传图片并开始识别后，这里会显示与参考时期的时间间隔。'
+  }
+
+  if (props.result?.status === 'rejected') {
+    return '当前图片属于库外个体，拒识状态下不提供时间间隔估计。'
+  }
+
+  return '该数值用于描述当前上传样本与库内参考时期之间的跨时间间隔。'
 })
 </script>
 
@@ -204,6 +255,77 @@ const summaryText = computed(() => {
     #eef4eb;
   opacity: 1;
   mix-blend-mode: normal;
+}
+
+.overview-main__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
+  padding: 28px 30px 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 244, 244, 0.96));
+  border: 1px solid rgba(181, 72, 72, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 18px 36px rgba(181, 72, 72, 0.08);
+  position: relative;
+}
+
+.overview-main__alert-badge {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  margin-top: 22px;
+  border-radius: 999px;
+  background: rgba(181, 72, 72, 0.1);
+  color: #9d4747;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.overview-main__alert-title {
+  max-width: 520px;
+  margin-top: 18px;
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.16;
+  font-weight: 800;
+  color: #7a3434;
+}
+
+.overview-main__alert-desc {
+  max-width: 560px;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(96, 54, 54, 0.84);
+}
+
+.overview-main__alert::before {
+  content: '';
+  width: 68px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b55d5d, #d89a9a);
+}
+
+.overview-main__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
+  padding: 24px;
+  text-align: center;
+  color: var(--demo-text-3);
+  font-size: 15px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(228, 236, 226, 0.96)),
+    #eef4eb;
 }
 
 .overview-main__media-mask {

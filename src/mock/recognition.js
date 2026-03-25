@@ -3,7 +3,7 @@ export const recognitionMock = {
   "result": {
     "status": "matched",
     "confidence": 98.2,
-    "predictedAge": "--",
+    "predictedDeltaT": 0,
     "predictedStage": "跨时期稳定",
     "target": {
       "name": "Hotlips",
@@ -16,7 +16,7 @@ export const recognitionMock = {
         "name": "Rocky",
         "code": "ID-002",
         "confidence": 96.8,
-        "latestYear": 2022,
+        "latestYear": 2020,
         "type": "non-human",
         "cover": "/images/demo/recognition/candidate-1-rocky.jpg"
       },
@@ -25,7 +25,7 @@ export const recognitionMock = {
         "name": "Sloth",
         "code": "ID-003",
         "confidence": 90.1,
-        "latestYear": 2022,
+        "latestYear": 2020,
         "type": "non-human",
         "cover": "/images/demo/recognition/candidate-2-sloth.jpg"
       },
@@ -34,7 +34,7 @@ export const recognitionMock = {
         "name": "Pintail",
         "code": "ID-004",
         "confidence": 83.4,
-        "latestYear": 2022,
+        "latestYear": 2019,
         "type": "non-human",
         "cover": "/images/demo/recognition/candidate-3-pintail.jpg"
       }
@@ -69,8 +69,8 @@ export const recognitionMock = {
       "个体编号": "ID-001",
       "个体类型": "非人类",
       "样本总数": 318,
-      "覆盖年份": "2017 - 2022",
-      "最近出现": "2022",
+      "覆盖年份": "2017 - 2020",
+      "参考时期": "2020",
       "数据来源": "本地 images 数据集"
     }
   }
@@ -84,7 +84,7 @@ const sharedCandidates = [
     "name": "Rocky",
     "code": "ID-002",
     "confidence": 96.8,
-    "latestYear": 2022,
+    "latestYear": 2020,
     "type": "non-human",
     "cover": "/images/demo/recognition/candidate-1-rocky.jpg"
   },
@@ -93,7 +93,7 @@ const sharedCandidates = [
     "name": "Sloth",
     "code": "ID-003",
     "confidence": 90.1,
-    "latestYear": 2022,
+    "latestYear": 2020,
     "type": "non-human",
     "cover": "/images/demo/recognition/candidate-2-sloth.jpg"
   },
@@ -102,7 +102,7 @@ const sharedCandidates = [
     "name": "Pintail",
     "code": "ID-004",
     "confidence": 83.4,
-    "latestYear": 2022,
+    "latestYear": 2019,
     "type": "non-human",
     "cover": "/images/demo/recognition/candidate-3-pintail.jpg"
   }
@@ -116,6 +116,7 @@ export const recognitionCases = {
     result: {
       ...hotlipsResult,
       confidence: 97.6,
+      predictedDeltaT: 3,
       predictedStage: "早期成长阶段",
       target: {
         ...hotlipsResult.target,
@@ -127,6 +128,7 @@ export const recognitionCases = {
     result: {
       ...hotlipsResult,
       confidence: 98.0,
+      predictedDeltaT: 2,
       predictedStage: "跨时期稳定",
       target: {
         ...hotlipsResult.target,
@@ -138,6 +140,7 @@ export const recognitionCases = {
     result: {
       ...hotlipsResult,
       confidence: 98.4,
+      predictedDeltaT: 1,
       predictedStage: "跨时期稳定",
       target: {
         ...hotlipsResult.target,
@@ -149,6 +152,7 @@ export const recognitionCases = {
     result: {
       ...hotlipsResult,
       confidence: 98.7,
+      predictedDeltaT: 0,
       predictedStage: "成熟稳定阶段",
       target: {
         ...hotlipsResult.target,
@@ -160,7 +164,7 @@ export const recognitionCases = {
     result: {
       status: "matched",
       confidence: 97.1,
-      predictedAge: "--",
+      predictedDeltaT: 0,
       predictedStage: "稳定成年阶段",
       target: {
         name: "Rocky",
@@ -173,7 +177,7 @@ export const recognitionCases = {
           name: "Hotlips",
           code: "ID-001",
           confidence: 92.4,
-          latestYear: 2022,
+          latestYear: 2020,
           type: "non-human",
           cover: "/images/demo/recognition/hotlips-target.jpg"
         },
@@ -185,8 +189,8 @@ export const recognitionCases = {
         "个体编号": "ID-002",
         "个体类型": "非人类",
         "样本总数": 124,
-        "覆盖年份": "2019 - 2022",
-        "最近出现": "2022",
+        "覆盖年份": "2018 - 2020",
+        "参考时期": "2020",
         "数据来源": "本地 images 数据集"
       }
     }
@@ -195,7 +199,7 @@ export const recognitionCases = {
     result: {
       status: "matched",
       confidence: 94.8,
-      predictedAge: "--",
+      predictedDeltaT: 0,
       predictedStage: "稳定成年阶段",
       target: {
         name: "Sloth",
@@ -208,7 +212,7 @@ export const recognitionCases = {
           name: "Hotlips",
           code: "ID-001",
           confidence: 89.7,
-          latestYear: 2022,
+          latestYear: 2020,
           type: "non-human",
           cover: "/images/demo/recognition/hotlips-target.jpg"
         },
@@ -220,8 +224,8 @@ export const recognitionCases = {
         "个体编号": "ID-003",
         "个体类型": "非人类",
         "样本总数": 96,
-        "覆盖年份": "2020 - 2022",
-        "最近出现": "2022",
+        "覆盖年份": "2018 - 2020",
+        "参考时期": "2020",
         "数据来源": "本地 images 数据集"
       }
     }
@@ -230,7 +234,7 @@ export const recognitionCases = {
     result: {
       status: "matched",
       confidence: 91.3,
-      predictedAge: "--",
+      predictedDeltaT: 0,
       predictedStage: "稳定成年阶段",
       target: {
         name: "Pintail",
@@ -243,7 +247,7 @@ export const recognitionCases = {
           name: "Hotlips",
           code: "ID-001",
           confidence: 86.4,
-          latestYear: 2022,
+          latestYear: 2020,
           type: "non-human",
           cover: "/images/demo/recognition/hotlips-target.jpg"
         },
@@ -255,8 +259,8 @@ export const recognitionCases = {
         "个体编号": "ID-004",
         "个体类型": "非人类",
         "样本总数": 88,
-        "覆盖年份": "2021 - 2022",
-        "最近出现": "2022",
+        "覆盖年份": "2017 - 2019",
+        "参考时期": "2019",
         "数据来源": "本地 images 数据集"
       }
     }
@@ -266,11 +270,11 @@ export const recognitionCases = {
 export const createUnknownRecognitionResult = (previewUrl, fileName) => ({
   result: {
     status: "rejected",
-    confidence: 0,
-    predictedAge: "--",
-    predictedStage: "未命中本地样本",
+    confidence: null,
+    predictedDeltaT: null,
+    predictedStage: "库外个体，拒绝识别",
     target: {
-      name: "未匹配样本",
+      name: "未知个体",
       code: fileName || "--",
       cover: previewUrl || recognitionMock.uploadPreview
     },
@@ -278,11 +282,29 @@ export const createUnknownRecognitionResult = (previewUrl, fileName) => ({
     timeline: [],
     identityInfo: {
       "个体编号": "--",
-      "个体类型": "--",
+      "个体类型": "未知",
       "样本总数": 0,
       "覆盖年份": "--",
-      "最近出现": "--",
+      "参考时期": "--",
+      "拒识原因": "当前上传图片未匹配到库内已登记个体",
       "数据来源": "当前上传图片不在内置样本集中"
     }
+  }
+})
+
+export const createEmptyRecognitionResult = () => ({
+  result: {
+    status: "idle",
+    confidence: null,
+    predictedDeltaT: null,
+    predictedStage: "等待上传图片并开始识别",
+    target: {
+      name: "暂无识别结果",
+      code: "--",
+      cover: ""
+    },
+    candidates: [],
+    timeline: [],
+    identityInfo: {}
   }
 })

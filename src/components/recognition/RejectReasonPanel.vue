@@ -37,7 +37,11 @@ const panelTitle = computed(() => {
   }
 
   if (props.status === 'rejected') {
-    return '当前上传图片未命中内置样本库'
+    return '当前上传图片属于库外个体，系统已拒绝识别'
+  }
+
+  if (props.status === 'idle') {
+    return '当前还没有识别结果'
   }
 
   return '当前结果暂无异常说明'
@@ -53,7 +57,11 @@ const panelDesc = computed(() => {
   }
 
   if (props.status === 'rejected') {
-    return '你仍然可以看到上传预览，但右侧不会给出已知身份，需要换成项目内已有样本图片。'
+    return '系统未在当前个体库中找到可确认身份的登记对象，因此不会返回候选身份和时间轴结果。'
+  }
+
+  if (props.status === 'idle') {
+    return '页面初始状态不会默认展示任何识别对象，等待你上传图片并点击开始识别。'
   }
 
   return '这里会根据识别状态展示对应说明。'
@@ -78,9 +86,17 @@ const panelList = computed(() => {
 
   if (props.status === 'rejected') {
     return [
-      '请上传项目内已有的演示图片文件',
-      '当前支持的文件包括 hotlips 系列和 3 张 candidate 图片',
-      '后续接入后端后可替换为真实检索逻辑'
+      '该图片被判定为库外个体，触发拒绝识别',
+      '右侧仅保留上传预览与拒识说明，不展示候选匹配结果',
+      '如需查看命中效果，请上传项目内已有的演示图片文件'
+    ]
+  }
+
+  if (props.status === 'idle') {
+    return [
+      '先在左侧上传一张图片',
+      '再点击“开始识别”触发本地演示匹配',
+      '重置后页面会回到当前空状态'
     ]
   }
 
