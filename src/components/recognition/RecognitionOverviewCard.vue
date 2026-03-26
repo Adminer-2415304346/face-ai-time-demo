@@ -15,20 +15,28 @@
               </div>
               <div class="overview-main__alert-badge">REJECTED</div>
             </div>
-            <img v-else-if="result.target?.cover" :src="result.target.cover" class="overview-main__cover" />
+
+            <img
+              v-else-if="result.target?.cover"
+              :src="result.target.cover"
+              class="overview-main__cover"
+              alt="识别主匹配预览"
+            />
+
             <div v-else class="overview-main__empty">
               上传图片后，这里会显示主匹配结果预览
             </div>
-            <div class="overview-main__media-mask"></div>
+
+            <div class="overview-main__media-mask" />
           </div>
 
           <div class="overview-main__content">
-            <StatusTag
-              :status="statusConfig.status"
-              :text="statusConfig.text"
-            />
+            <div class="overview-main__topline">
+              <StatusTag :status="statusConfig.status" :text="statusConfig.text" />
+              <div v-if="showPrimaryBadge" class="overview-main__eyebrow">PRIMARY MATCH</div>
+            </div>
 
-            <div class="overview-main__heading">
+            <div class="overview-main__heading glass-block-soft">
               <div class="overview-main__name">
                 {{ result.target?.name || '--' }}
               </div>
@@ -153,6 +161,10 @@ const statusConfig = computed(() => {
   }
 })
 
+const showPrimaryBadge = computed(() => {
+  return Boolean(props.result?.target?.cover) && props.result?.status !== 'rejected'
+})
+
 const summaryText = computed(() => {
   const status = props.result?.status
 
@@ -234,36 +246,40 @@ const deltaTDescription = computed(() => {
 .overview-main__media {
   position: relative;
   min-width: 0;
-  min-height: 0;
+  min-height: 360px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 32px;
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.32), transparent 36%),
-    linear-gradient(180deg, rgba(215, 228, 213, 0.92), rgba(230, 237, 228, 0.88));
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.38), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(160, 190, 167, 0.22), transparent 30%),
+    linear-gradient(180deg, rgba(218, 231, 216, 0.96), rgba(232, 239, 230, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 20px 42px rgba(126, 161, 138, 0.12);
 }
 
 .overview-main__cover {
+  position: relative;
+  z-index: 1;
   width: 100%;
+  height: 100%;
   display: block;
-  aspect-ratio: 16 / 9;
-  min-height: 320px;
   object-fit: contain;
   object-position: center;
-  padding: 12px;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(228, 236, 226, 0.96)),
-    #eef4eb;
-  opacity: 1;
-  mix-blend-mode: normal;
+  border-radius: 28px;
+  background: transparent;
 }
 
 .overview-main__alert {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  aspect-ratio: 16 / 9;
-  min-height: 320px;
+  width: 100%;
+  height: 100%;
   padding: 28px 30px 26px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 244, 244, 0.96));
@@ -271,7 +287,6 @@ const deltaTDescription = computed(() => {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
     0 18px 36px rgba(181, 72, 72, 0.08);
-  position: relative;
 }
 
 .overview-main__alert-badge {
@@ -314,15 +329,17 @@ const deltaTDescription = computed(() => {
 }
 
 .overview-main__empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 16 / 9;
-  min-height: 320px;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
   padding: 24px;
   text-align: center;
   color: var(--demo-text-3);
   font-size: 15px;
+  line-height: 1.7;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(228, 236, 226, 0.96)),
     #eef4eb;
@@ -332,25 +349,42 @@ const deltaTDescription = computed(() => {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.18)),
-    linear-gradient(135deg, rgba(126, 161, 138, 0.12), rgba(255, 255, 255, 0));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.16)),
+    linear-gradient(135deg, rgba(126, 161, 138, 0.1), rgba(255, 255, 255, 0));
   pointer-events: none;
 }
 
 .overview-main__content {
   display: flex;
   flex-direction: column;
+  gap: 18px;
   min-width: 0;
   padding: 4px 2px 0;
 }
 
+.overview-main__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.overview-main__eyebrow {
+  color: rgba(53, 85, 71, 0.6);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
 .overview-main__heading {
-  margin-top: 18px;
+  padding: 22px 24px 20px;
+  border-radius: 24px;
 }
 
 .overview-main__name {
   font-size: clamp(34px, 4.2vw, 56px);
-  line-height: 1.08;
+  line-height: 1.05;
   font-weight: 700;
   color: var(--demo-text-1);
   word-break: break-word;
@@ -360,11 +394,10 @@ const deltaTDescription = computed(() => {
   margin-top: 12px;
   font-size: 16px;
   color: var(--demo-text-2);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 .overview-main__summary {
-  margin-top: 28px;
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
   gap: 18px;
@@ -374,10 +407,13 @@ const deltaTDescription = computed(() => {
 .overview-main__score-block,
 .overview-main__brief {
   min-width: 0;
-  padding: 18px 20px;
+  padding: 22px 22px 20px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.38);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.34));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.74),
+    0 12px 26px rgba(121, 146, 127, 0.06);
 }
 
 .overview-main__score-label,
@@ -396,6 +432,7 @@ const deltaTDescription = computed(() => {
   font-weight: 700;
   color: var(--demo-primary);
   letter-spacing: -0.04em;
+  text-shadow: 0 10px 24px rgba(126, 161, 138, 0.12);
 }
 
 .overview-main__desc {
@@ -418,6 +455,14 @@ const deltaTDescription = computed(() => {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     0 10px 22px rgba(121, 146, 127, 0.08);
+}
+
+.glass-block-soft {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.28));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 10px 24px rgba(121, 146, 127, 0.05);
 }
 
 .overview-panel {
@@ -522,16 +567,17 @@ const deltaTDescription = computed(() => {
   }
 
   .overview-main__media {
-    max-height: none;
+    min-height: 260px;
+    aspect-ratio: 4 / 3;
+    border-radius: 26px;
   }
 
   .overview-main__cover {
-    min-height: 240px;
-    aspect-ratio: 4 / 3;
+    border-radius: 22px;
   }
 
-  .overview-main__summary {
-    margin-top: 22px;
+  .overview-main__heading {
+    padding: 18px 18px 16px;
   }
 
   .overview-identity__grid {
