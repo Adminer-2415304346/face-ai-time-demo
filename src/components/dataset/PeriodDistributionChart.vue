@@ -72,7 +72,17 @@
           </div>
           <div class="chart-panel__badge">分布关联</div>
         </div>
-        <VChart class="chart chart--heatmap" :option="heatmapOption" autoresize />
+
+        <div class="chart-stack chart-stack--insight">
+          <div class="chart-block">
+            <VChart class="chart chart--heatmap" :option="heatmapOption" autoresize />
+          </div>
+
+          <div class="chart-block chart-block--soft chart-block--radar">
+            <div class="chart-block__title">年度特征对比</div>
+            <VChart class="chart chart--radar" :option="featureTrendOption" autoresize />
+          </div>
+        </div>
       </section>
     </div>
   </BaseCard>
@@ -192,6 +202,20 @@ const heatmapData = computed(() => {
 
     return values.map((value, metricIndex) => [yearIndex, metricIndex, value])
   })
+})
+
+const metricSeriesData = computed(() => {
+  return heatmapMetrics.map((metric, metricIndex) => ({
+    name: metric,
+    values: years.value.map((_, yearIndex) => {
+      const match = heatmapData.value.find(
+        ([currentYearIndex, currentMetricIndex]) =>
+          currentYearIndex === yearIndex && currentMetricIndex === metricIndex
+      )
+
+      return match ? match[2] : 0
+    })
+  }))
 })
 
 const yearOption = computed(() => ({
@@ -428,6 +452,98 @@ const heatmapOption = computed(() => ({
       }
     }
   ]
+}))
+
+const featureTrendOption = computed(() => ({
+  tooltip: {
+    trigger: 'axis',
+    ...tooltipStyle
+  },
+  legend: {
+    top: 0,
+    left: 'center',
+    icon: 'circle',
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: {
+      color: axisLabelColor
+    }
+  },
+  grid: {
+    left: 16,
+    right: 12,
+    top: 44,
+    bottom: 8,
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    data: years.value,
+    boundaryGap: false,
+    axisTick: {
+      show: false
+    },
+    axisLine: {
+      lineStyle: {
+        color: 'rgba(38, 64, 51, 0.14)'
+      }
+    },
+    axisLabel: {
+      color: axisLabelColor,
+      fontSize: 12
+    }
+  },
+  yAxis: {
+    type: 'value',
+    min: 0,
+    max: 100,
+    splitNumber: 4,
+    splitLine: {
+      lineStyle: {
+        color: 'rgba(38, 64, 51, 0.08)'
+      }
+    },
+    axisLine: {
+      show: false
+    },
+    axisTick: {
+      show: false
+    },
+    axisLabel: {
+      color: secondaryAxisColor
+    }
+  },
+  color: ['#6f8f7a', '#89ab95', '#a6c0a1', '#c4d7bf'],
+  series: metricSeriesData.value.map((item, index) => ({
+    name: item.name,
+    type: 'line',
+    smooth: true,
+    symbol: 'circle',
+    symbolSize: 7,
+    data: item.values,
+    lineStyle: {
+      width: index === 0 ? 3 : 2.4
+    },
+    itemStyle: {
+      borderColor: '#ffffff',
+      borderWidth: 2
+    },
+    areaStyle: index === 0
+      ? {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(111, 143, 122, 0.18)' },
+              { offset: 1, color: 'rgba(111, 143, 122, 0.02)' }
+            ]
+          }
+        }
+      : undefined
+  }))
 }))
 
 const typeOption = computed(() => ({
@@ -677,6 +793,10 @@ const stageOption = computed(() => ({
     linear-gradient(180deg, rgba(245, 249, 244, 0.9), rgba(236, 243, 234, 0.72));
 }
 
+.chart-block--radar {
+  min-height: 0;
+}
+
 .chart-block__title {
   padding: 2px 4px 10px;
   font-size: 13px;
@@ -710,6 +830,14 @@ const stageOption = computed(() => ({
   height: 320px;
 }
 
+.chart-stack--insight {
+  grid-template-rows: minmax(320px, auto) minmax(280px, auto);
+}
+
+.chart--radar {
+  height: 280px;
+}
+
 @media (max-width: 1200px) {
   .chart-grid {
     grid-template-columns: 1fr;
@@ -728,6 +856,14 @@ const stageOption = computed(() => ({
   .chart--stage,
   .chart--heatmap {
     height: 300px;
+  }
+
+  .chart-stack--insight {
+    grid-template-rows: 300px 280px;
+  }
+
+  .chart--radar {
+    height: 280px;
   }
 }
 

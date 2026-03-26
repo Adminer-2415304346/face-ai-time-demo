@@ -62,30 +62,10 @@ export const videoMock = {
   ]
 }
 
-export const videoCases = {
-  'hotlips.mp4': structuredClone(videoMock),
-  'cross-time-hotlips.mp4': structuredClone(videoMock),
-  'demo-video.mp4': structuredClone(videoMock)
-}
-
 export const createEmptyVideoResult = () => ({
   mode: 'idle',
   cover: '',
   stats: [],
-  keyframes: [],
-  groups: []
-})
-
-export const createUnknownVideoResult = () => ({
-  mode: 'rejected',
-  cover: '',
-  stats: [
-    { label: '检测个体', value: 1, extra: '视频片段内检测到 1 个未登记目标' },
-    { label: '高置信匹配', value: 0, extra: '当前未形成稳定匹配结果' },
-    { label: '待确认', value: 0, extra: '当前没有可进入人工复核的候选' },
-    { label: '拒识', value: 1, extra: '系统判定为库外视频目标并拒绝识别' },
-    { label: '有效抓拍', value: 0, extra: '未进入后续跨时间比对流程' }
-  ],
   keyframes: [],
   groups: []
 })

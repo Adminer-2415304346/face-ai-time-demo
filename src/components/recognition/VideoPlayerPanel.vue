@@ -20,7 +20,7 @@
       </div>
 
       <div class="video-player__mask">
-        <div class="video-player__status" :class="`is-${statusType}`">
+        <div class="video-player__status">
           <span class="video-player__dot" />
           {{ statusText }}
         </div>
@@ -68,10 +68,6 @@ const props = defineProps({
   statusText: {
     type: String,
     default: ''
-  },
-  statusType: {
-    type: String,
-    default: 'normal'
   },
   uploaded: {
     type: Boolean,
@@ -163,6 +159,7 @@ const handleFileChange = (event) => {
   flex-direction: column;
   justify-content: space-between;
   padding: 18px;
+  pointer-events: none;
   background:
     linear-gradient(180deg, rgba(28, 41, 33, 0.18), rgba(28, 41, 33, 0.04) 36%, rgba(28, 41, 33, 0.22)),
     linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent);
@@ -181,12 +178,7 @@ const handleFileChange = (event) => {
   font-size: 13px;
   font-weight: 600;
   box-shadow: 0 12px 24px rgba(52, 79, 64, 0.14);
-}
-
-.video-player__status.is-reject {
-  background: rgba(255, 245, 245, 0.92);
-  color: #9f4646;
-  box-shadow: 0 12px 24px rgba(159, 70, 70, 0.16);
+  pointer-events: auto;
 }
 
 .video-player__dot {
@@ -195,11 +187,6 @@ const handleFileChange = (event) => {
   border-radius: 50%;
   background: #7ea18a;
   box-shadow: 0 0 0 6px rgba(126, 161, 138, 0.14);
-}
-
-.video-player__status.is-reject .video-player__dot {
-  background: #c46363;
-  box-shadow: 0 0 0 6px rgba(196, 99, 99, 0.16);
 }
 
 .video-player__action {
@@ -221,6 +208,7 @@ const handleFileChange = (event) => {
     0 14px 30px rgba(71, 97, 81, 0.16),
     inset 0 0 0 1px rgba(255, 255, 255, 0.76);
   cursor: pointer;
+  pointer-events: auto;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
