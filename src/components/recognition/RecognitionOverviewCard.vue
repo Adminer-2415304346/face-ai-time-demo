@@ -1,7 +1,6 @@
 <template>
   <BaseCard
     title="识别结果总览"
-    desc="当前样本的主匹配结果、预测 ΔT 与身份信息说明"
     class="recognition-overview-card"
   >
     <div class="overview-shell glass-block">
@@ -36,27 +35,20 @@
               <div v-if="showPrimaryBadge" class="overview-main__eyebrow">PRIMARY MATCH</div>
             </div>
 
-            <div class="overview-main__heading glass-block-soft">
-              <div class="overview-main__name">
-                {{ result.target?.name || '--' }}
+            <div class="overview-main__summary glass-block-soft">
+              <div class="overview-main__identity">
+                <div class="overview-main__name">
+                  {{ result.target?.name || '--' }}
+                </div>
+                <div class="overview-main__code">
+                  {{ result.target?.code || '--' }}
+                </div>
               </div>
-              <div class="overview-main__code">
-                {{ result.target?.code || '--' }}
-              </div>
-            </div>
 
-            <div class="overview-main__summary">
               <div class="overview-main__score-block">
                 <div class="overview-main__score-label">识别置信度</div>
                 <div class="overview-main__score">
                   {{ confidenceText }}
-                </div>
-              </div>
-
-              <div class="overview-main__brief">
-                <div class="overview-main__brief-label">结果说明</div>
-                <div class="overview-main__desc">
-                  {{ summaryText }}
                 </div>
               </div>
             </div>
@@ -66,7 +58,7 @@
         <div class="overview-side">
           <div class="overview-panel">
             <div class="block-title">预测 ΔT</div>
-            <div class="block-desc">显示当前上传样本与参考时期之间的时间间隔</div>
+            <div class="block-desc">显示当前上传样本与数据库最近图像数据之间的时间间隔</div>
 
             <div class="overview-age__value-row">
               <div class="overview-age__value">
@@ -165,28 +157,6 @@ const showPrimaryBadge = computed(() => {
   return Boolean(props.result?.target?.cover) && props.result?.status !== 'rejected'
 })
 
-const summaryText = computed(() => {
-  const status = props.result?.status
-
-  if (status === 'matched') {
-    return '识别结果稳定，支持跨时间域样本关联。'
-  }
-
-  if (status === 'pending') {
-    return '当前结果存在相似候选，建议结合更多样本进一步确认。'
-  }
-
-  if (status === 'rejected') {
-    return '当前上传图片未匹配到库内已登记个体，系统已执行拒绝识别。'
-  }
-
-  if (status === 'idle') {
-    return '当前还没有识别结果，请先在左侧上传图片并开始识别。'
-  }
-
-  return '当前展示识别结果摘要信息。'
-})
-
 const confidenceText = computed(() => {
   if (props.result?.confidence === null || props.result?.confidence === undefined) {
     return '--'
@@ -207,7 +177,7 @@ const showDeltaTUnit = computed(() => deltaTText.value !== '--')
 
 const deltaTDescription = computed(() => {
   if (props.result?.status === 'idle') {
-    return '上传图片并开始识别后，这里会显示与参考时期的时间间隔。'
+    return '上传图片并开始识别后，这里会显示与参考时期之间的时间间隔。'
   }
 
   if (props.result?.status === 'rejected') {
@@ -223,40 +193,43 @@ const deltaTDescription = computed(() => {
   overflow: hidden;
 }
 
+.recognition-overview-card:deep(.base-card__header) {
+  margin-bottom: 12px;
+}
+
 .overview-shell {
-  padding: 22px;
-  border-radius: 28px;
+  padding: 14px;
+  border-radius: 20px;
 }
 
 .overview-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.92fr);
-  gap: 22px;
+  grid-template-columns: minmax(0, 1.52fr) minmax(220px, 0.62fr);
+  gap: 12px;
   align-items: stretch;
 }
 
 .overview-main {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 10px;
   min-width: 0;
-  align-items: stretch;
 }
 
 .overview-main__media {
   position: relative;
   min-width: 0;
-  min-height: 360px;
+  min-height: clamp(168px, 20vh, 220px);
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 32px;
+  border-radius: 22px;
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.38), transparent 34%),
     radial-gradient(circle at bottom right, rgba(160, 190, 167, 0.22), transparent 30%),
     linear-gradient(180deg, rgba(218, 231, 216, 0.96), rgba(232, 239, 230, 0.92));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 20px 42px rgba(126, 161, 138, 0.12);
+    0 14px 28px rgba(126, 161, 138, 0.09);
 }
 
 .overview-main__cover {
@@ -267,8 +240,7 @@ const deltaTDescription = computed(() => {
   display: block;
   object-fit: contain;
   object-position: center;
-  border-radius: 28px;
-  background: transparent;
+  border-radius: 20px;
 }
 
 .overview-main__alert {
@@ -276,11 +248,9 @@ const deltaTDescription = computed(() => {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
   width: 100%;
   height: 100%;
-  padding: 28px 30px 26px;
+  padding: 22px 24px 20px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 244, 244, 0.96));
   border: 1px solid rgba(181, 72, 72, 0.18);
@@ -290,11 +260,11 @@ const deltaTDescription = computed(() => {
 }
 
 .overview-main__alert-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  min-height: 30px;
+  min-height: 28px;
   padding: 0 12px;
-  margin-top: 22px;
+  margin-top: 16px;
   border-radius: 999px;
   background: rgba(181, 72, 72, 0.1);
   color: #9d4747;
@@ -305,8 +275,8 @@ const deltaTDescription = computed(() => {
 
 .overview-main__alert-title {
   max-width: 520px;
-  margin-top: 18px;
-  font-size: clamp(28px, 3.2vw, 42px);
+  margin-top: 14px;
+  font-size: clamp(22px, 2.4vw, 32px);
   line-height: 1.16;
   font-weight: 800;
   color: #7a3434;
@@ -314,15 +284,15 @@ const deltaTDescription = computed(() => {
 
 .overview-main__alert-desc {
   max-width: 560px;
-  margin-top: 14px;
-  font-size: 15px;
-  line-height: 1.9;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.7;
   color: rgba(96, 54, 54, 0.84);
 }
 
 .overview-main__alert::before {
   content: '';
-  width: 68px;
+  width: 60px;
   height: 4px;
   border-radius: 999px;
   background: linear-gradient(90deg, #b55d5d, #d89a9a);
@@ -335,10 +305,10 @@ const deltaTDescription = computed(() => {
   width: 100%;
   height: 100%;
   place-items: center;
-  padding: 24px;
+  padding: 20px;
   text-align: center;
   color: var(--demo-text-3);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.7;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(228, 236, 226, 0.96)),
@@ -357,95 +327,84 @@ const deltaTDescription = computed(() => {
 .overview-main__content {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
   min-width: 0;
-  padding: 4px 2px 0;
 }
 
 .overview-main__topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .overview-main__eyebrow {
-  color: rgba(53, 85, 71, 0.6);
+  color: rgba(53, 85, 71, 0.58);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
 }
 
-.overview-main__heading {
-  padding: 22px 24px 20px;
-  border-radius: 24px;
+.overview-main__summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 12px 14px;
+  border-radius: 16px;
+}
+
+.overview-main__identity {
+  min-width: 0;
 }
 
 .overview-main__name {
-  font-size: clamp(34px, 4.2vw, 56px);
-  line-height: 1.05;
+  font-size: clamp(28px, 2.8vw, 40px);
+  line-height: 1.02;
   font-weight: 700;
   color: var(--demo-text-1);
   word-break: break-word;
 }
 
 .overview-main__code {
-  margin-top: 12px;
-  font-size: 16px;
+  margin-top: 6px;
+  font-size: 13px;
   color: var(--demo-text-2);
   letter-spacing: 0.08em;
 }
 
-.overview-main__summary {
-  display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-  gap: 18px;
-  align-items: stretch;
+.overview-main__score-block {
+  min-width: 164px;
+  padding: 8px 0 0 10px;
+  border-left: 1px solid rgba(126, 161, 138, 0.14);
 }
 
-.overview-main__score-block,
-.overview-main__brief {
-  min-width: 0;
-  padding: 22px 22px 20px;
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.34));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.74),
-    0 12px 26px rgba(121, 146, 127, 0.06);
-}
-
-.overview-main__score-label,
-.overview-main__brief-label {
-  font-size: 12px;
+.overview-main__score-label {
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--demo-text-3);
+  text-align: right;
 }
 
 .overview-main__score {
-  margin-top: 14px;
-  font-size: clamp(48px, 6vw, 72px);
+  margin-top: 6px;
+  font-size: clamp(30px, 3.2vw, 46px);
   line-height: 0.95;
   font-weight: 700;
   color: var(--demo-primary);
   letter-spacing: -0.04em;
+  text-align: right;
   text-shadow: 0 10px 24px rgba(126, 161, 138, 0.12);
-}
-
-.overview-main__desc {
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--demo-text-3);
-  line-height: 1.9;
 }
 
 .overview-side {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .glass-block {
@@ -466,8 +425,8 @@ const deltaTDescription = computed(() => {
 }
 
 .overview-panel {
-  padding: 22px;
-  border-radius: 24px;
+  padding: 14px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.34);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.68),
@@ -475,88 +434,205 @@ const deltaTDescription = computed(() => {
 }
 
 .block-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--demo-text-1);
 }
 
 .block-desc {
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.7;
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 1.45;
   color: var(--demo-text-3);
 }
 
 .overview-age__value-row {
-  margin-top: 28px;
+  margin-top: 10px;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
 }
 
 .overview-age__value {
-  font-size: clamp(44px, 5vw, 66px);
+  font-size: clamp(30px, 3vw, 42px);
   line-height: 1;
   font-weight: 700;
   color: var(--demo-primary);
 }
 
 .overview-age__unit {
-  margin-bottom: 8px;
-  font-size: 16px;
+  margin-bottom: 3px;
+  font-size: 12px;
   color: var(--demo-text-2);
 }
 
 .overview-age__stage {
-  margin-top: 14px;
-  font-size: 18px;
+  margin-top: 6px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--demo-text-1);
 }
 
 .overview-age__text {
-  margin-top: 72px;
-  font-size: 13px;
-  line-height: 1.9;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.45;
   color: var(--demo-text-3);
 }
 
 .overview-identity__grid {
-  margin-top: 18px;
+  margin-top: 10px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 6px;
 }
 
 .overview-identity__item {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 8px 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.44);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .overview-identity__label {
-  font-size: 12px;
+  font-size: 10px;
   color: var(--demo-text-3);
 }
 
 .overview-identity__value {
-  margin-top: 10px;
-  font-size: 15px;
-  line-height: 1.5;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.25;
   font-weight: 700;
   color: var(--demo-text-1);
   word-break: break-word;
 }
 
-@media (max-width: 1400px) {
+@media (min-width: 1360px) and (min-aspect-ratio: 16 / 9) and (max-height: 1080px) {
+  .recognition-overview-card:deep(.base-card) {
+    padding: 16px;
+  }
+
+  .recognition-overview-card:deep(.base-card__header) {
+    margin-bottom: 8px;
+  }
+
+  .recognition-overview-card:deep(.base-card__title) {
+    font-size: 16px;
+  }
+
+  .overview-shell {
+    padding: 10px;
+  }
+
   .overview-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(184px, 0.48fr);
+    gap: 8px;
+  }
+
+  .overview-main {
+    gap: 6px;
+  }
+
+  .overview-main__media {
+    min-height: clamp(150px, 17.5vh, 196px);
+    border-radius: 18px;
+  }
+
+  .overview-main__cover {
+    border-radius: 16px;
+  }
+
+  .overview-main__summary {
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .overview-main__name {
+    font-size: clamp(24px, 2.2vw, 34px);
+  }
+
+  .overview-main__code {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .overview-main__score-block {
+    min-width: 140px;
+    padding-top: 6px;
+    padding-left: 8px;
+  }
+
+  .overview-main__score-label {
+    font-size: 10px;
+  }
+
+  .overview-main__score {
+    margin-top: 4px;
+    font-size: clamp(26px, 2.6vw, 36px);
+  }
+
+  .overview-side {
+    gap: 8px;
+  }
+
+  .overview-panel {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .block-title {
+    font-size: 14px;
+  }
+
+  .block-desc {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .overview-age__value-row {
+    margin-top: 8px;
+  }
+
+  .overview-age__value {
+    font-size: clamp(24px, 2.3vw, 32px);
+  }
+
+  .overview-age__stage {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .overview-age__text {
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .overview-identity__grid {
+    margin-top: 8px;
     grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .overview-identity__item {
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+
+  .overview-identity__label {
+    font-size: 10px;
+  }
+
+  .overview-identity__value {
+    margin-top: 4px;
+    font-size: 11px;
   }
 }
 
-@media (max-width: 1100px) {
-  .overview-main__summary {
+@media (max-width: 1400px) {
+  .overview-layout {
     grid-template-columns: 1fr;
   }
 }
@@ -569,23 +645,27 @@ const deltaTDescription = computed(() => {
   .overview-main__media {
     min-height: 260px;
     aspect-ratio: 4 / 3;
-    border-radius: 26px;
   }
 
-  .overview-main__cover {
-    border-radius: 22px;
+  .overview-main__summary {
+    grid-template-columns: 1fr;
+    align-items: start;
   }
 
-  .overview-main__heading {
-    padding: 18px 18px 16px;
+  .overview-main__score-block {
+    min-width: 0;
+    padding: 10px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(126, 161, 138, 0.14);
+  }
+
+  .overview-main__score-label,
+  .overview-main__score {
+    text-align: left;
   }
 
   .overview-identity__grid {
     grid-template-columns: 1fr;
-  }
-
-  .overview-age__text {
-    margin-top: 28px;
   }
 }
 </style>

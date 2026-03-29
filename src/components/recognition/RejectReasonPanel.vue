@@ -1,7 +1,7 @@
 <template>
   <BaseCard
     title="异常与拒识说明"
-    desc="低置信或失败结果时显示原因与建议"
+    desc="根据当前识别状态给出结果说明与处理建议"
   >
     <div class="reject-panel">
       <div class="reject-panel__title">{{ panelTitle }}</div>
@@ -29,104 +29,140 @@ const props = defineProps({
 
 const panelTitle = computed(() => {
   if (props.status === 'matched') {
-    return '当前样本已命中内置库，可直接展示匹配结果'
+    return '当前样本已命中目标个体，可直接查看识别结果'
   }
 
   if (props.status === 'pending') {
-    return '当前样本存在近似候选，建议人工复核'
+    return '当前样本存在近似候选，建议进一步复核'
   }
 
   if (props.status === 'rejected') {
-    return '当前上传图片属于库外个体，系统已拒绝识别'
+    return '当前上传图片未命中库内个体，系统已拒识'
   }
 
   if (props.status === 'idle') {
-    return '当前还没有识别结果'
+    return '等待上传样本并启动识别'
   }
 
-  return '当前结果暂无异常说明'
+  return '当前结果暂无补充说明'
 })
 
 const panelDesc = computed(() => {
   if (props.status === 'matched') {
-    return '当前页面使用本地样本进行演示识别，已根据上传图片切换到对应结果。'
+    return '系统已完成当前样本与参考图库的比对，并同步更新主结果、候选图像与时间轴。'
   }
 
   if (props.status === 'pending') {
-    return '候选之间相似度接近时，可在这里引导用户进行二次确认。'
+    return '当候选结果相近时，建议结合时间轴、候选列表与人工经验共同判断。'
   }
 
   if (props.status === 'rejected') {
-    return '系统未在当前个体库中找到可确认身份的登记对象，因此不会返回候选身份和时间轴结果。'
+    return '系统未找到可确认身份的匹配对象，因此不会返回候选结果与跨期参考样本。'
   }
 
   if (props.status === 'idle') {
-    return '页面初始状态不会默认展示任何识别对象，等待你上传图片并点击开始识别。'
+    return '当前页面尚未加载识别结果，上传图片后即可查看匹配结果与相关信息。'
   }
 
-  return '这里会根据识别状态展示对应说明。'
+  return '说明信息会随识别状态自动更新。'
 })
 
 const panelList = computed(() => {
   if (props.status === 'matched') {
     return [
-      '支持上传内置样本并切换到对应识别结果',
-      '当前结果来自本地 mock 数据映射',
-      '后续可以在这里无缝替换成真实接口返回'
+      '可查看主匹配结果、Top-K 候选图像和跨期参考样本',
+      '当前结果已根据上传样本切换到对应个体',
+      '适合用于答辩展示识别链路与结果解释'
     ]
   }
 
   if (props.status === 'pending') {
     return [
-      '图像质量接近阈值，建议补充更多样本',
-      '可结合时间轴和候选列表进一步确认',
-      '必要时切换为手动确认模式'
+      '建议补充更多样本或提升图片质量后再次识别',
+      '可优先对比时间接近的参考样本',
+      '必要时切换到人工确认流程'
     ]
   }
 
   if (props.status === 'rejected') {
     return [
-      '该图片被判定为库外个体，触发拒绝识别',
-      '右侧仅保留上传预览与拒识说明，不展示候选匹配结果',
-      '如需查看命中效果，请上传项目内已有的演示图片文件'
+      '当前样本被判定为库外个体，未进入正常匹配流程',
+      '页面将保留上传预览与拒识说明，不展示候选结果',
+      '可重新上传库内样本继续演示识别效果'
     ]
   }
 
   if (props.status === 'idle') {
     return [
-      '先在左侧上传一张图片',
-      '再点击“开始识别”触发本地演示匹配',
-      '重置后页面会回到当前空状态'
+      '先在左侧上传一张待识别图片',
+      '点击“开始识别”后系统会进行样本比对',
+      '识别完成后将自动展示结果总览与候选信息'
     ]
   }
 
-  return ['当前暂无补充说明']
+  return ['当前暂无额外提示']
 })
 </script>
 
 <style scoped lang="less">
 .reject-panel {
-  padding: 12px 0;
+  padding: 8px 0 2px;
 }
 
 .reject-panel__title {
+  font-size: 17px;
+  line-height: 1.35;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--demo-text-1);
 }
 
 .reject-panel__desc {
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--demo-text-3);
 }
 
 .reject-panel__list {
-  margin: 12px 0 0;
-  padding-left: 18px;
+  margin: 16px 0 0;
+  padding-left: 20px;
   color: var(--demo-text-2);
 }
 
+.reject-panel__list li {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .reject-panel__list li + li {
-  margin-top: 6px;
+  margin-top: 8px;
+}
+
+@media (min-width: 1360px) and (min-aspect-ratio: 16 / 9) and (max-height: 1080px) {
+  .reject-panel__title {
+    font-size: 15px;
+    line-height: 1.32;
+  }
+
+  .reject-panel__desc {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .reject-panel__list {
+    margin-top: 14px;
+    padding-left: 18px;
+  }
+
+  .reject-panel__list li {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .reject-panel__list li + li {
+    margin-top: 6px;
+  }
 }
 </style>

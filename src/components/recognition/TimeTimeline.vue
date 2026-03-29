@@ -1,16 +1,16 @@
 <template>
   <BaseCard
-    title="跨时间样本时间轴"
-    desc="展示同一个体在不同时期的代表样本"
+    title="跨期样本时间轴"
+    desc="展示目标个体在不同年份的参考样本"
   >
     <div v-if="list.length" class="timeline">
       <div v-for="item in list" :key="item.id" class="timeline__item">
-        <img :src="item.image" class="timeline__image" />
+        <img :src="item.image" class="timeline__image" :alt="`${item.year}`" />
         <div class="timeline__year">{{ item.year }}</div>
         <div class="timeline__label">{{ item.label }}</div>
       </div>
     </div>
-    <div v-else class="timeline-empty">上传图片并开始识别后，这里会展示跨时间样本时间轴。</div>
+    <div v-else class="timeline-empty">识别完成后，这里会展示该个体的跨期参考样本。</div>
   </BaseCard>
 </template>
 

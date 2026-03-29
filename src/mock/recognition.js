@@ -1,307 +1,334 @@
-export const recognitionMock = {
-  "uploadPreview": "/images/demo/recognition/hotlips-target.jpg",
-  "result": {
-    "status": "matched",
-    "confidence": 98.2,
-    "predictedDeltaT": 0,
-    "predictedStage": "跨时期稳定",
-    "target": {
-      "name": "Hotlips",
-      "code": "ID-001",
-      "cover": "/images/demo/recognition/hotlips-target.jpg"
-    },
-    "candidates": [
-      {
-        "id": "1",
-        "name": "Rocky",
-        "code": "ID-002",
-        "confidence": 96.8,
-        "latestYear": 2020,
-        "type": "non-human",
-        "cover": "/images/demo/recognition/candidate-1-rocky.jpg"
-      },
-      {
-        "id": "2",
-        "name": "Sloth",
-        "code": "ID-003",
-        "confidence": 90.1,
-        "latestYear": 2020,
-        "type": "non-human",
-        "cover": "/images/demo/recognition/candidate-2-sloth.jpg"
-      },
-      {
-        "id": "3",
-        "name": "Pintail",
-        "code": "ID-004",
-        "confidence": 83.4,
-        "latestYear": 2019,
-        "type": "non-human",
-        "cover": "/images/demo/recognition/candidate-3-pintail.jpg"
-      }
-    ],
-    "timeline": [
-      {
-        "id": "1",
-        "year": 2017,
-        "label": "第 1 时期",
-        "image": "/images/demo/recognition/timeline/hotlips-2017.jpg"
-      },
-      {
-        "id": "2",
-        "year": 2018,
-        "label": "第 2 时期",
-        "image": "/images/demo/recognition/timeline/hotlips-2018.jpg"
-      },
-      {
-        "id": "3",
-        "year": 2019,
-        "label": "第 3 时期",
-        "image": "/images/demo/recognition/timeline/hotlips-2019.jpg"
-      },
-      {
-        "id": "4",
-        "year": 2020,
-        "label": "第 4 时期",
-        "image": "/images/demo/recognition/timeline/hotlips-2020.jpg"
-      }
-    ],
-    "identityInfo": {
-      "个体编号": "ID-001",
-      "个体类型": "非人类",
-      "样本总数": 318,
-      "覆盖年份": "2017 - 2020",
-      "参考时期": "2020",
-      "数据来源": "本地 images 数据集"
-    }
+const imageRoot = '/images/real/recognition'
+
+const querySamples = {
+  hotlips: `${imageRoot}/test/2022/P2197283_0_Hotlips_0.JPG`,
+  rocky: `${imageRoot}/test/2022/P2198283_0_Rocky_0.JPG`,
+  sloth: `${imageRoot}/test/2022/P2185915_0_Sloth_0.JPG`
+}
+
+const trainSamples = {
+  hotlips: {
+    2017: `${imageRoot}/train/2017/598A0343_BLR-2_0_Hotlips.JPG`,
+    2018: `${imageRoot}/train/2018/598A0253_0_Hotlips.JPG`,
+    2019: `${imageRoot}/train/2019/598A0134_Hotlips.JPG`,
+    2020: `${imageRoot}/train/2020/P1379809_Hotlips.JPG`
+  },
+  rocky: {
+    2017: `${imageRoot}/train/2017/598A0127_0_Rocky.JPG`,
+    2018: `${imageRoot}/train/2018/598A0430-2_0_Rocky.JPG`,
+    2019: `${imageRoot}/train/2019/598A0067_Rocky.JPG`,
+    2020: `${imageRoot}/train/2020/598A8707_Rocky.JPG`
+  },
+  sloth: {
+    2017: `${imageRoot}/train/2017/598A0711_TG_0_Sloth.JPG`,
+    2018: `${imageRoot}/train/2018/598A5708_0_Sloth.JPG`,
+    2019: `${imageRoot}/train/2019/598A1005_Sloth.JPG`,
+    2020: `${imageRoot}/train/2020/P1366035_Sloth.JPG`
   }
 }
 
-const hotlipsResult = recognitionMock.result
+const createIdentityInfo = ({
+  code,
+  type,
+  total,
+  years,
+  referenceYear,
+  queryYear,
+  source
+}) => ({
+  个体编号: code,
+  个体类型: type,
+  样本总数: total,
+  覆盖年份: years,
+  参考时期: String(referenceYear),
+  待识别样本: `测试集 ${queryYear}`,
+  数据来源: source
+})
 
-const sharedCandidates = [
+const createTimeline = (sampleMap) =>
+  Object.entries(sampleMap).map(([year, image], index) => ({
+    id: `timeline-${year}`,
+    year: Number(year),
+    label: `训练样本 ${index + 1}`,
+    image
+  }))
+
+const createTopK = (items) =>
+  items
+    .slice()
+    .sort((a, b) => b.confidence - a.confidence)
+    .map((item, index) => ({
+      ...item,
+      id: item.id || `top-${index + 1}`
+    }))
+
+const createHotlipsResult = ({
+  confidence = 98.4,
+  predictedDeltaT = 2,
+  predictedStage = '跨期稳定阶段',
+  previewCover = querySamples.hotlips
+} = {}) => ({
+  status: 'matched',
+  confidence,
+  predictedDeltaT,
+  predictedStage,
+  target: {
+    name: 'Hotlips',
+    code: 'ID-001',
+    cover: previewCover
+  },
+  candidates: createTopK([
+    {
+      name: 'Hotlips',
+      code: 'ID-001',
+      confidence: 98.4,
+      latestYear: 2020,
+      sampleYear: 2020,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.hotlips[2020]
+    },
+    {
+      name: 'Hotlips',
+      code: 'ID-001',
+      confidence: 97.8,
+      latestYear: 2019,
+      sampleYear: 2019,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.hotlips[2019]
+    },
+    {
+      name: 'Hotlips',
+      code: 'ID-001',
+      confidence: 97.2,
+      latestYear: 2018,
+      sampleYear: 2018,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.hotlips[2018]
+    }
+  ]),
+  timeline: createTimeline(trainSamples.hotlips),
+  identityInfo: createIdentityInfo({
+    code: 'ID-001',
+    type: '非人类',
+    total: 318,
+    years: '2017 - 2020',
+    referenceYear: 2020,
+    queryYear: 2022,
+    source: '训练集 2017-2020 / 测试集 2022'
+  })
+})
+
+const createRockyResult = ({
+  confidence = 97.1,
+  predictedDeltaT = 2,
+  predictedStage = '稳定成年阶段',
+  previewCover = querySamples.rocky
+} = {}) => ({
+  status: 'matched',
+  confidence,
+  predictedDeltaT,
+  predictedStage,
+  target: {
+    name: 'Rocky',
+    code: 'ID-002',
+    cover: previewCover
+  },
+  candidates: createTopK([
+    {
+      name: 'Rocky',
+      code: 'ID-002',
+      confidence: 97.1,
+      latestYear: 2020,
+      sampleYear: 2020,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.rocky[2020]
+    },
+    {
+      name: 'Rocky',
+      code: 'ID-002',
+      confidence: 96.4,
+      latestYear: 2019,
+      sampleYear: 2019,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.rocky[2019]
+    },
+    {
+      name: 'Rocky',
+      code: 'ID-002',
+      confidence: 95.7,
+      latestYear: 2018,
+      sampleYear: 2018,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.rocky[2018]
+    }
+  ]),
+  timeline: createTimeline(trainSamples.rocky),
+  identityInfo: createIdentityInfo({
+    code: 'ID-002',
+    type: '非人类',
+    total: 124,
+    years: '2017 - 2020',
+    referenceYear: 2020,
+    queryYear: 2022,
+    source: '训练集 2017-2020 / 测试集 2022'
+  })
+})
+
+const createSlothResult = ({
+  confidence = 94.8,
+  predictedDeltaT = 2,
+  predictedStage = '稳定成年阶段',
+  previewCover = querySamples.sloth
+} = {}) => ({
+  status: 'matched',
+  confidence,
+  predictedDeltaT,
+  predictedStage,
+  target: {
+    name: 'Sloth',
+    code: 'ID-003',
+    cover: previewCover
+  },
+  candidates: createTopK([
+    {
+      name: 'Sloth',
+      code: 'ID-003',
+      confidence: 94.8,
+      latestYear: 2020,
+      sampleYear: 2020,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.sloth[2020]
+    },
+    {
+      name: 'Sloth',
+      code: 'ID-003',
+      confidence: 93.9,
+      latestYear: 2019,
+      sampleYear: 2019,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.sloth[2019]
+    },
+    {
+      name: 'Sloth',
+      code: 'ID-003',
+      confidence: 92.8,
+      latestYear: 2018,
+      sampleYear: 2018,
+      sampleType: '训练集',
+      type: 'non-human',
+      cover: trainSamples.sloth[2018]
+    }
+  ]),
+  timeline: createTimeline(trainSamples.sloth),
+  identityInfo: createIdentityInfo({
+    code: 'ID-003',
+    type: '非人类',
+    total: 96,
+    years: '2017 - 2020',
+    referenceYear: 2020,
+    queryYear: 2022,
+    source: '训练集 2017-2020 / 测试集 2022'
+  })
+})
+
+const recognitionMockResult = createHotlipsResult()
+
+export const recognitionMock = {
+  uploadPreview: querySamples.hotlips,
+  result: recognitionMockResult
+}
+
+export const recognitionCases = {
+  'p2197283_0_hotlips_0.jpg': {
+    result: createHotlipsResult({ previewCover: querySamples.hotlips })
+  },
+  'p2198283_0_rocky_0.jpg': {
+    result: createRockyResult({ previewCover: querySamples.rocky })
+  },
+  'p2185915_0_sloth_0.jpg': {
+    result: createSlothResult({ previewCover: querySamples.sloth })
+  }
+}
+
+const keywordRecognitionCases = [
   {
-    "id": "1",
-    "name": "Rocky",
-    "code": "ID-002",
-    "confidence": 96.8,
-    "latestYear": 2020,
-    "type": "non-human",
-    "cover": "/images/demo/recognition/candidate-1-rocky.jpg"
+    keyword: '_hotlips_',
+    createResult: () => createHotlipsResult({ previewCover: querySamples.hotlips })
   },
   {
-    "id": "2",
-    "name": "Sloth",
-    "code": "ID-003",
-    "confidence": 90.1,
-    "latestYear": 2020,
-    "type": "non-human",
-    "cover": "/images/demo/recognition/candidate-2-sloth.jpg"
+    keyword: '_rocky_',
+    createResult: () => createRockyResult({ previewCover: querySamples.rocky })
   },
   {
-    "id": "3",
-    "name": "Pintail",
-    "code": "ID-004",
-    "confidence": 83.4,
-    "latestYear": 2019,
-    "type": "non-human",
-    "cover": "/images/demo/recognition/candidate-3-pintail.jpg"
+    keyword: '_sloth_',
+    createResult: () => createSlothResult({ previewCover: querySamples.sloth })
   }
 ]
 
-export const recognitionCases = {
-  "hotlips-target.jpg": {
-    result: hotlipsResult
-  },
-  "hotlips-2017.jpg": {
-    result: {
-      ...hotlipsResult,
-      confidence: 97.6,
-      predictedDeltaT: 3,
-      predictedStage: "早期成长阶段",
-      target: {
-        ...hotlipsResult.target,
-        cover: "/images/demo/recognition/timeline/hotlips-2017.jpg"
-      }
-    }
-  },
-  "hotlips-2018.jpg": {
-    result: {
-      ...hotlipsResult,
-      confidence: 98.0,
-      predictedDeltaT: 2,
-      predictedStage: "跨时期稳定",
-      target: {
-        ...hotlipsResult.target,
-        cover: "/images/demo/recognition/timeline/hotlips-2018.jpg"
-      }
-    }
-  },
-  "hotlips-2019.jpg": {
-    result: {
-      ...hotlipsResult,
-      confidence: 98.4,
-      predictedDeltaT: 1,
-      predictedStage: "跨时期稳定",
-      target: {
-        ...hotlipsResult.target,
-        cover: "/images/demo/recognition/timeline/hotlips-2019.jpg"
-      }
-    }
-  },
-  "hotlips-2020.jpg": {
-    result: {
-      ...hotlipsResult,
-      confidence: 98.7,
-      predictedDeltaT: 0,
-      predictedStage: "成熟稳定阶段",
-      target: {
-        ...hotlipsResult.target,
-        cover: "/images/demo/recognition/timeline/hotlips-2020.jpg"
-      }
-    }
-  },
-  "candidate-1-rocky.jpg": {
-    result: {
-      status: "matched",
-      confidence: 97.1,
-      predictedDeltaT: 0,
-      predictedStage: "稳定成年阶段",
-      target: {
-        name: "Rocky",
-        code: "ID-002",
-        cover: "/images/demo/recognition/candidate-1-rocky.jpg"
-      },
-      candidates: [
-        {
-          id: "1",
-          name: "Hotlips",
-          code: "ID-001",
-          confidence: 92.4,
-          latestYear: 2020,
-          type: "non-human",
-          cover: "/images/demo/recognition/hotlips-target.jpg"
-        },
-        sharedCandidates[1],
-        sharedCandidates[2]
-      ],
-      timeline: [],
-      identityInfo: {
-        "个体编号": "ID-002",
-        "个体类型": "非人类",
-        "样本总数": 124,
-        "覆盖年份": "2018 - 2020",
-        "参考时期": "2020",
-        "数据来源": "本地 images 数据集"
-      }
-    }
-  },
-  "candidate-2-sloth.jpg": {
-    result: {
-      status: "matched",
-      confidence: 94.8,
-      predictedDeltaT: 0,
-      predictedStage: "稳定成年阶段",
-      target: {
-        name: "Sloth",
-        code: "ID-003",
-        cover: "/images/demo/recognition/candidate-2-sloth.jpg"
-      },
-      candidates: [
-        {
-          id: "1",
-          name: "Hotlips",
-          code: "ID-001",
-          confidence: 89.7,
-          latestYear: 2020,
-          type: "non-human",
-          cover: "/images/demo/recognition/hotlips-target.jpg"
-        },
-        sharedCandidates[0],
-        sharedCandidates[2]
-      ],
-      timeline: [],
-      identityInfo: {
-        "个体编号": "ID-003",
-        "个体类型": "非人类",
-        "样本总数": 96,
-        "覆盖年份": "2018 - 2020",
-        "参考时期": "2020",
-        "数据来源": "本地 images 数据集"
-      }
-    }
-  },
-  "candidate-3-pintail.jpg": {
-    result: {
-      status: "matched",
-      confidence: 91.3,
-      predictedDeltaT: 0,
-      predictedStage: "稳定成年阶段",
-      target: {
-        name: "Pintail",
-        code: "ID-004",
-        cover: "/images/demo/recognition/candidate-3-pintail.jpg"
-      },
-      candidates: [
-        {
-          id: "1",
-          name: "Hotlips",
-          code: "ID-001",
-          confidence: 86.4,
-          latestYear: 2020,
-          type: "non-human",
-          cover: "/images/demo/recognition/hotlips-target.jpg"
-        },
-        sharedCandidates[0],
-        sharedCandidates[1]
-      ],
-      timeline: [],
-      identityInfo: {
-        "个体编号": "ID-004",
-        "个体类型": "非人类",
-        "样本总数": 88,
-        "覆盖年份": "2017 - 2019",
-        "参考时期": "2019",
-        "数据来源": "本地 images 数据集"
-      }
-    }
+export const resolveRecognitionCase = (fileName = '') => {
+  const normalizedFileName = String(fileName).trim().toLowerCase()
+
+  if (!normalizedFileName) {
+    return null
   }
+
+  const exactMatchedPayload = recognitionCases[normalizedFileName]
+
+  if (exactMatchedPayload) {
+    return exactMatchedPayload
+  }
+
+  const keywordMatchedCase = keywordRecognitionCases.find(({ keyword }) =>
+    normalizedFileName.includes(keyword)
+  )
+
+  return keywordMatchedCase ? { result: keywordMatchedCase.createResult() } : null
 }
 
 export const createUnknownRecognitionResult = (previewUrl, fileName) => ({
   result: {
-    status: "rejected",
+    status: 'rejected',
     confidence: null,
     predictedDeltaT: null,
-    predictedStage: "库外个体，拒绝识别",
+    predictedStage: '库外个体，拒绝识别',
     target: {
-      name: "未知个体",
-      code: fileName || "--",
+      name: '未知个体',
+      code: fileName || '--',
       cover: previewUrl || recognitionMock.uploadPreview
     },
     candidates: [],
     timeline: [],
     identityInfo: {
-      "个体编号": "--",
-      "个体类型": "未知",
-      "样本总数": 0,
-      "覆盖年份": "--",
-      "参考时期": "--",
-      "拒识原因": "当前上传图片未匹配到库内已登记个体",
-      "数据来源": "当前上传图片不在内置样本集中"
+      个体编号: '--',
+      个体类型: '未知',
+      样本总数: 0,
+      覆盖年份: '--',
+      参考时期: '--',
+      待识别样本: '测试集 2022',
+      拒识原因: '当前上传图片未匹配到库内已登记个体。',
+      数据来源: '当前样本未命中已配置的测试集映射'
     }
   }
 })
 
 export const createEmptyRecognitionResult = () => ({
   result: {
-    status: "idle",
+    status: 'idle',
     confidence: null,
     predictedDeltaT: null,
-    predictedStage: "等待上传图片并开始识别",
+    predictedStage: '等待上传 2022 测试样本',
     target: {
-      name: "暂无识别结果",
-      code: "--",
-      cover: ""
+      name: '暂无识别结果',
+      code: '--',
+      cover: ''
     },
     candidates: [],
     timeline: [],

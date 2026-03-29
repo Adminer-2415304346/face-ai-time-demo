@@ -24,13 +24,24 @@ defineProps({
 <style scoped lang="less">
 .overview-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(100%, 1480px);
+  margin: 0 auto;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  align-items: stretch;
+  justify-content: center;
 }
 
 @media (max-width: 1200px) {
   .overview-grid {
+    width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

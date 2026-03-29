@@ -1,26 +1,30 @@
 <template>
   <BaseCard
     title="上传与识别控制"
-    desc="选择个体库、数据库与识别模式并上传待识别图片"
+    desc="上传 2022 测试集样本，并与训练集参考图库进行比对"
   >
     <div class="upload-panel">
       <a-upload-dragger
         :show-upload-list="false"
         :before-upload="handleBeforeUpload"
+        :disabled="loading"
         accept=".jpg,.jpeg,.png"
         class="upload-box"
+        :class="{ 'is-loading': loading }"
       >
         <div v-if="previewUrl" class="upload-preview">
           <img :src="previewUrl" :alt="previewName" class="upload-preview__image" />
           <div class="upload-preview__meta">
             <p class="upload-preview__name">{{ previewName }}</p>
-            <p class="upload-preview__sub">已完成本地预览，尚未上传到服务器</p>
+            <p class="upload-preview__sub">
+              {{ loading ? '样本已锁定，正在进行识别比对' : '已完成本地预览，尚未上传到服务器' }}
+            </p>
           </div>
         </div>
 
         <template v-else>
-          <p class="upload-box__text">点击或拖拽上传图片</p>
-          <p class="upload-box__sub">支持 JPG / PNG，建议使用清晰正脸样本</p>
+          <p class="upload-box__text">{{ loading ? '识别中，请稍候' : '点击或拖拽上传图片' }}</p>
+          <p class="upload-box__sub">支持 JPG / PNG，建议优先上传 2022 测试集样本</p>
         </template>
       </a-upload-dragger>
 
@@ -29,6 +33,7 @@
           <a-segmented
             v-model:value="subjectType"
             :options="subjectTypeOptions"
+            :disabled="loading"
             block
             class="sage-segmented"
           />
@@ -38,23 +43,40 @@
           <a-select
             v-model:value="database"
             :options="databaseOptions"
+            :disabled="loading"
             placeholder="请选择需要检索的数据库"
             class="sage-select"
           />
         </a-form-item>
 
         <a-form-item label="识别模式">
-          <a-radio-group v-model:value="recognitionMode" class="sage-radio-group">
+          <a-radio-group
+            v-model:value="recognitionMode"
+            :disabled="loading"
+            class="sage-radio-group"
+          >
             <a-radio-button value="auto">自动匹配</a-radio-button>
             <a-radio-button value="manual">手动确认</a-radio-button>
           </a-radio-group>
         </a-form-item>
 
         <div class="actions">
-          <a-button type="primary" class="action-btn action-btn--primary" @click="handleRecognize">
-            开始识别
+          <a-button
+            type="primary"
+            class="action-btn action-btn--primary"
+            :loading="loading"
+            :disabled="loading"
+            @click="handleRecognize"
+          >
+            {{ loading ? '识别中...' : '开始识别' }}
           </a-button>
-          <a-button class="action-btn action-btn--secondary" @click="handleReset">重置</a-button>
+          <a-button
+            class="action-btn action-btn--secondary"
+            :disabled="loading"
+            @click="handleReset"
+          >
+            重置
+          </a-button>
         </div>
       </a-form>
     </div>
@@ -66,6 +88,13 @@ import { onBeforeUnmount, ref } from 'vue'
 import { message } from 'ant-design-vue'
 
 import BaseCard from '@/components/common/BaseCard.vue'
+
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const emit = defineEmits(['recognize', 'reset'])
 
@@ -84,7 +113,7 @@ const subjectTypeOptions = [
 const databaseOptions = [
   { label: '人类时序样本库 A', value: 'human-sequence-a' },
   { label: '人类时序样本库 B', value: 'human-sequence-b' },
-  { label: '跨时期面部比对库', value: 'cross-period-face-db' },
+  { label: '跨期生物面部训练库', value: 'cross-period-face-db' },
   { label: '非人类样本库', value: 'non-human-species-db' }
 ]
 
@@ -100,6 +129,10 @@ const revokePreviewUrl = () => {
 }
 
 const handleBeforeUpload = (file) => {
+  if (props.loading) {
+    return false
+  }
+
   if (!allowedImageTypes.has(file.type)) {
     message.warning('请上传 JPG 或 PNG 格式图片')
     return false
@@ -114,6 +147,10 @@ const handleBeforeUpload = (file) => {
 }
 
 const handleRecognize = () => {
+  if (props.loading) {
+    return
+  }
+
   if (!selectedFile.value || !previewUrl.value) {
     message.warning('请先选择一张待识别图片')
     return
@@ -130,6 +167,10 @@ const handleRecognize = () => {
 }
 
 const handleReset = () => {
+  if (props.loading) {
+    return
+  }
+
   revokePreviewUrl()
   previewName.value = ''
   selectedFile.value = null
@@ -152,6 +193,11 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.35);
+  transition: opacity 0.2s ease;
+}
+
+.upload-box.is-loading {
+  opacity: 0.76;
 }
 
 .upload-preview {

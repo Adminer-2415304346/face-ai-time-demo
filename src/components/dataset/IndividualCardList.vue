@@ -1,11 +1,11 @@
 <template>
   <BaseCard
     title="个体样本卡片"
-    desc="按卡片方式展示数据库中的代表个体信息"
+    desc="按卡片方式查看数据库中的代表个体"
   >
     <div class="card-grid">
       <div v-for="item in list" :key="item.id" class="person-card">
-        <img :src="item.cover" class="person-card__cover" />
+        <img :src="item.cover" class="person-card__cover" :alt="item.name" />
 
         <div class="person-card__content">
           <div class="person-card__title-row">
@@ -22,7 +22,9 @@
           <div class="person-card__meta">参考时期：{{ item.latestUpdate }}</div>
 
           <div class="person-card__actions">
-            <a-button type="link" class="person-card__link">查看详情</a-button>
+            <a-button type="link" class="person-card__link" @click="$emit('view-detail', item)">
+              查看详情
+            </a-button>
           </div>
         </div>
       </div>
@@ -33,6 +35,8 @@
 <script setup>
 import BaseCard from '@/components/common/BaseCard.vue'
 import StatusTag from '@/components/common/StatusTag.vue'
+
+defineEmits(['view-detail'])
 
 defineProps({
   list: {
@@ -113,6 +117,7 @@ const mapStatus = (status) => {
 }
 
 .person-card__link {
+  padding: 0;
   color: var(--demo-primary);
 }
 

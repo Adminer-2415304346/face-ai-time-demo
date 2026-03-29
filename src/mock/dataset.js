@@ -2,22 +2,17 @@ export const datasetStatsMock = [
   {
     label: '个体总数',
     value: '2506',
-    extra: '基于本地 images 数据集统计'
+    extra: ''
   },
   {
     label: '图片总数',
     value: '5825',
-    extra: '覆盖历史时期样本子集'
+    extra: ''
   },
   {
     label: '时间跨度',
     value: '4 年',
     extra: '2017 - 2020'
-  },
-  {
-    label: '跨期个体',
-    value: '22',
-    extra: '可用于跨时间展示筛选'
   }
 ]
 
@@ -116,7 +111,7 @@ export const typicalCaseListMock = [
   {
     id: 'case-rocky',
     title: 'Rocky 跨时期案例',
-    desc: '覆盖 2017 至 2020 年，共 4 个时期样本，适合讲解长期跟踪与特征保持。',
+    desc: '覆盖 2017 至 2020 年，共 4 个时期样本，适合展示长期跟踪与特征保持。',
     periodCount: 4,
     years: ['2017', '2018', '2019', '2020'],
     image: '/images/demo/dataset/cases/rocky.jpg'
