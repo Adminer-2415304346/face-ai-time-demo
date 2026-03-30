@@ -16,9 +16,6 @@
           <img :src="previewUrl" :alt="previewName" class="upload-preview__image" />
           <div class="upload-preview__meta">
             <p class="upload-preview__name">{{ previewName }}</p>
-            <p class="upload-preview__sub">
-              {{ loading ? '样本已锁定，正在进行识别比对' : '已完成本地预览，尚未上传到服务器' }}
-            </p>
           </div>
         </div>
 
@@ -224,11 +221,6 @@ onBeforeUnmount(() => {
   font-size: 15px;
   font-weight: 600;
   color: var(--demo-text-1);
-}
-
-.upload-preview__sub {
-  margin: 4px 0 0;
-  color: var(--demo-text-3);
 }
 
 .upload-box__text {

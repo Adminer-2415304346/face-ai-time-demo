@@ -1,16 +1,13 @@
 <template>
-  <BaseCard
-    title="识别结果总览"
-    class="recognition-overview-card"
-  >
+  <BaseCard title="识别结果总览" class="recognition-overview-card">
     <div class="overview-shell glass-block">
       <div class="overview-layout">
         <div class="overview-main">
           <div class="overview-main__media">
             <div v-if="result.status === 'rejected'" class="overview-main__alert">
-              <div class="overview-main__alert-title">库外个体，拒绝识别</div>
+              <div class="overview-main__alert-title">当前样本未命中库内个体</div>
               <div class="overview-main__alert-desc">
-                当前上传图片未匹配到库内已登记个体，系统不会展示主匹配结果预览。
+                当前上传图片未匹配到已登记个体，因此不展示主匹配结果预览。
               </div>
               <div class="overview-main__alert-badge">REJECTED</div>
             </div>
@@ -23,7 +20,11 @@
             />
 
             <div v-else class="overview-main__empty">
-              上传图片后，这里会显示主匹配结果预览
+              <div class="overview-main__empty-icon">2022</div>
+              <div class="overview-main__empty-title">等待上传测试样本</div>
+              <div class="overview-main__empty-text">
+                上传图片并开始识别后，这里会展示当前样本的主匹配预览。
+              </div>
             </div>
 
             <div class="overview-main__media-mask" />
@@ -38,10 +39,10 @@
             <div class="overview-main__summary glass-block-soft">
               <div class="overview-main__identity">
                 <div class="overview-main__name">
-                  {{ result.target?.name || '--' }}
+                  {{ result.target?.name || '等待识别结果' }}
                 </div>
                 <div class="overview-main__code">
-                  {{ result.target?.code || '--' }}
+                  {{ result.target?.code || 'TEST-2022' }}
                 </div>
               </div>
 
@@ -58,7 +59,7 @@
         <div class="overview-side">
           <div class="overview-panel">
             <div class="block-title">预测 ΔT</div>
-            <div class="block-desc">显示当前上传样本与数据库最近图像数据之间的时间间隔</div>
+            <div class="block-desc">展示当前上传样本与数据库最近参考图像之间的时间间隔</div>
 
             <div class="overview-age__value-row">
               <div class="overview-age__value">
@@ -74,13 +75,18 @@
             <div class="overview-age__text">
               {{ deltaTDescription }}
             </div>
+
+            <div v-if="isIdle" class="overview-age__hint">
+              <div class="overview-age__hint-dot" />
+              <span>识别完成后，这里会自动更新跨期时间跨度与阶段判断</span>
+            </div>
           </div>
 
           <div class="overview-panel">
             <div class="block-title">身份信息</div>
             <div class="block-desc">展示识别对象的结构化信息</div>
 
-            <div class="overview-identity__grid">
+            <div v-if="hasIdentityInfo" class="overview-identity__grid">
               <div
                 v-for="(value, key) in info"
                 :key="key"
@@ -88,6 +94,23 @@
               >
                 <div class="overview-identity__label">{{ key }}</div>
                 <div class="overview-identity__value">{{ value }}</div>
+              </div>
+            </div>
+
+            <div v-else class="overview-identity__empty">
+              <div class="overview-identity__placeholder">
+                <div
+                  v-for="item in idleIdentityItems"
+                  :key="item.label"
+                  class="overview-identity__placeholder-item"
+                >
+                  <div class="overview-identity__label">{{ item.label }}</div>
+                  <div class="overview-identity__placeholder-line" :class="item.widthClass" />
+                </div>
+              </div>
+
+              <div class="overview-identity__tip">
+                上传测试样本后，这里会展示个体编号、类别、参考时期和数据来源等关键信息。
               </div>
             </div>
           </div>
@@ -115,6 +138,17 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const idleIdentityItems = [
+  { label: '个体编号', widthClass: 'is-medium' },
+  { label: '个体类型', widthClass: 'is-short' },
+  { label: '参考时期', widthClass: 'is-medium' },
+  { label: '数据来源', widthClass: 'is-long' }
+]
+
+const isIdle = computed(() => props.result?.status === 'idle')
+
+const hasIdentityInfo = computed(() => Object.keys(props.info || {}).length > 0)
 
 const statusConfig = computed(() => {
   const status = props.result?.status
@@ -177,14 +211,14 @@ const showDeltaTUnit = computed(() => deltaTText.value !== '--')
 
 const deltaTDescription = computed(() => {
   if (props.result?.status === 'idle') {
-    return '上传图片并开始识别后，这里会显示与参考时期之间的时间间隔。'
+    return '上传图片并开始识别后，这里会显示测试样本与参考时期之间的时间间隔。'
   }
 
   if (props.result?.status === 'rejected') {
     return '当前图片属于库外个体，拒识状态下不提供时间间隔估计。'
   }
 
-  return '该数值用于描述当前上传样本与库内参考时期之间的跨时间间隔。'
+  return '该数值用于描述当前上传样本与库内参考时期之间的跨期时间跨度。'
 })
 </script>
 
@@ -263,6 +297,7 @@ const deltaTDescription = computed(() => {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
+  width: fit-content;
   padding: 0 12px;
   margin-top: 16px;
   border-radius: 999px;
@@ -301,18 +336,48 @@ const deltaTDescription = computed(() => {
 .overview-main__empty {
   position: relative;
   z-index: 1;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  place-items: center;
-  padding: 20px;
+  padding: 24px 28px;
   text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.9), rgba(228, 236, 226, 0.96)),
+    #eef4eb;
+}
+
+.overview-main__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(126, 161, 138, 0.12);
+  color: var(--demo-primary);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.overview-main__empty-title {
+  margin-top: 14px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--demo-text-1);
+}
+
+.overview-main__empty-text {
+  max-width: 360px;
+  margin-top: 10px;
   color: var(--demo-text-3);
   font-size: 14px;
   line-height: 1.7;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(228, 236, 226, 0.96)),
-    #eef4eb;
 }
 
 .overview-main__media-mask {
@@ -480,6 +545,30 @@ const deltaTDescription = computed(() => {
   color: var(--demo-text-3);
 }
 
+.overview-age__hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(235, 242, 233, 0.9), rgba(244, 248, 243, 0.72));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: var(--demo-text-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.overview-age__hint-dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(126, 161, 138, 0.95), rgba(147, 182, 158, 0.82));
+  box-shadow: 0 0 0 5px rgba(126, 161, 138, 0.08);
+}
+
 .overview-identity__grid {
   margin-top: 10px;
   display: grid;
@@ -506,6 +595,49 @@ const deltaTDescription = computed(() => {
   font-weight: 700;
   color: var(--demo-text-1);
   word-break: break-word;
+}
+
+.overview-identity__empty {
+  margin-top: 10px;
+}
+
+.overview-identity__placeholder {
+  display: grid;
+  gap: 6px;
+}
+
+.overview-identity__placeholder-item {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.overview-identity__placeholder-line {
+  height: 10px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(201, 215, 199, 0.9), rgba(230, 237, 228, 0.95));
+}
+
+.overview-identity__placeholder-line.is-short {
+  width: 42%;
+}
+
+.overview-identity__placeholder-line.is-medium {
+  width: 58%;
+}
+
+.overview-identity__placeholder-line.is-long {
+  width: 78%;
+}
+
+.overview-identity__tip {
+  margin-top: 10px;
+  padding: 0 2px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--demo-text-3);
 }
 
 @media (min-width: 1360px) and (min-aspect-ratio: 16 / 9) and (max-height: 1080px) {
@@ -541,6 +673,23 @@ const deltaTDescription = computed(() => {
 
   .overview-main__cover {
     border-radius: 16px;
+  }
+
+  .overview-main__empty-icon {
+    min-width: 64px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .overview-main__empty-title {
+    margin-top: 12px;
+    font-size: 18px;
+  }
+
+  .overview-main__empty-text {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.6;
   }
 
   .overview-main__summary {
@@ -610,6 +759,12 @@ const deltaTDescription = computed(() => {
     line-height: 1.35;
   }
 
+  .overview-age__hint {
+    margin-top: 10px;
+    padding: 8px 9px;
+    font-size: 10px;
+  }
+
   .overview-identity__grid {
     margin-top: 8px;
     grid-template-columns: 1fr;
@@ -628,6 +783,26 @@ const deltaTDescription = computed(() => {
   .overview-identity__value {
     margin-top: 4px;
     font-size: 11px;
+  }
+
+  .overview-identity__empty {
+    margin-top: 8px;
+  }
+
+  .overview-identity__placeholder-item {
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+
+  .overview-identity__placeholder-line {
+    height: 9px;
+    margin-top: 6px;
+  }
+
+  .overview-identity__tip {
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.45;
   }
 }
 
