@@ -53,7 +53,7 @@
       <header class="demo-shell__header glass-panel">
         <div>
           <div class="header-title">{{ currentTitle }}</div>
-          <div class="header-desc">{{ currentDesc }}</div>
+          <div v-if="currentDesc" class="header-desc">{{ currentDesc }}</div>
         </div>
       </header>
 
@@ -149,7 +149,7 @@ const currentDesc = computed(() => {
   }
 
   if (route.path.startsWith('/recognition')) {
-    return '面向演示答辩场景的多模态展示前端'
+    return ''
   }
 
   return '系统展示页面'

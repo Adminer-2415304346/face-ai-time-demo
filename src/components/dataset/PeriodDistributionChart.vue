@@ -29,13 +29,13 @@
           </div>
         </div>
 
-        <div class="chart-stack">
-          <div class="chart-block">
+        <div class="chart-stack chart-stack--timeline">
+          <div class="chart-block chart-block--tall">
             <div class="chart-block__title">年度样本数量</div>
             <VChart class="chart chart--bar" :option="yearOption" autoresize />
           </div>
 
-          <div class="chart-block chart-block--soft">
+          <div class="chart-block chart-block--soft chart-block--medium">
             <div class="chart-block__title">累计样本趋势</div>
             <VChart class="chart chart--line" :option="cumulativeOption" autoresize />
           </div>
@@ -50,7 +50,10 @@
           </div>
           <div class="chart-panel__badge">结构概览</div>
         </div>
-        <VChart class="chart chart--pie" :option="typeOption" autoresize />
+
+        <div class="chart-block chart-block--pie">
+          <VChart class="chart chart--pie" :option="typeOption" autoresize />
+        </div>
       </section>
 
       <section class="chart-panel chart-panel--stage">
@@ -61,7 +64,10 @@
           </div>
           <div class="chart-panel__badge">阶段概览</div>
         </div>
-        <VChart class="chart chart--stage" :option="stageOption" autoresize />
+
+        <div class="chart-block chart-block--stage">
+          <VChart class="chart chart--stage" :option="stageOption" autoresize />
+        </div>
       </section>
 
       <section class="chart-panel chart-panel--heatmap">
@@ -74,13 +80,13 @@
         </div>
 
         <div class="chart-stack chart-stack--insight">
-          <div class="chart-block">
+          <div class="chart-block chart-block--tall chart-block--heatmap">
             <VChart class="chart chart--heatmap" :option="heatmapOption" autoresize />
           </div>
 
-          <div class="chart-block chart-block--soft chart-block--radar">
+          <div class="chart-block chart-block--soft chart-block--medium">
             <div class="chart-block__title">年度特征对比</div>
-            <VChart class="chart chart--radar" :option="featureTrendOption" autoresize />
+            <VChart class="chart chart--trend" :option="featureTrendOption" autoresize />
           </div>
         </div>
       </section>
@@ -94,25 +100,19 @@ import BaseCard from '@/components/common/BaseCard.vue'
 
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart, PieChart, HeatmapChart } from 'echarts/charts'
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  VisualMapComponent
-} from 'echarts/components'
+import { SVGRenderer } from 'echarts/renderers'
+import { BarChart, CustomChart, LineChart, PieChart } from 'echarts/charts'
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
 
 use([
-  CanvasRenderer,
+  SVGRenderer,
   BarChart,
+  CustomChart,
   LineChart,
   PieChart,
-  HeatmapChart,
   GridComponent,
-  TooltipComponent,
   LegendComponent,
-  VisualMapComponent
+  TooltipComponent
 ])
 
 const props = defineProps({
@@ -142,20 +142,23 @@ const tooltipStyle = {
 const axisLabelColor = 'rgba(38, 64, 51, 0.68)'
 const secondaryAxisColor = 'rgba(38, 64, 51, 0.52)'
 const splitLineColor = 'rgba(38, 64, 51, 0.08)'
+const heatmapMetrics = ['结构稳定度', '阶段活跃度', '累计规模', '年度样本']
 
 const years = computed(() => props.yearData.map((item) => item.year))
-const yearValues = computed(() => props.yearData.map((item) => item.value))
+const yearValues = computed(() => props.yearData.map((item) => Number(item.value || 0)))
+const stageNames = computed(() => props.stageData.map((item) => item.name))
+const stageValues = computed(() => props.stageData.map((item) => Number(item.value || 0)))
 
 const cumulativeValues = computed(() => {
   let total = 0
   return yearValues.value.map((value) => {
-    total += Number(value || 0)
+    total += value
     return total
   })
 })
 
 const totalValueText = computed(() => {
-  const total = yearValues.value.reduce((sum, value) => sum + Number(value || 0), 0)
+  const total = yearValues.value.reduce((sum, value) => sum + value, 0)
   return total.toLocaleString('zh-CN')
 })
 
@@ -170,53 +173,50 @@ const coverageText = computed(() => {
   return `${props.yearData[0].year} - ${props.yearData[props.yearData.length - 1].year}`
 })
 
-const heatmapMetrics = [
-  '年度样本',
-  '累计规模',
-  '阶段活跃度',
-  '结构稳定度'
-]
-
 const maxYearValue = computed(() => Math.max(...yearValues.value, 0))
 const maxCumulativeValue = computed(() => Math.max(...cumulativeValues.value, 0))
-const maxStageValue = computed(() =>
-  Math.max(...props.stageData.map((item) => Number(item.value || 0)), 0)
-)
+const maxStageValue = computed(() => Math.max(...stageValues.value, 0))
 
-const heatmapData = computed(() => {
-  return years.value.flatMap((year, yearIndex) => {
-    const currentYearValue = Number(yearValues.value[yearIndex] || 0)
-    const currentCumulativeValue = Number(cumulativeValues.value[yearIndex] || 0)
-    const stageReference = props.stageData[yearIndex % Math.max(props.stageData.length, 1)]
-    const stageValue = Number(stageReference?.value || 0)
+const heatmapRows = computed(() => {
+  return years.value.map((year, yearIndex) => {
+    const currentYearValue = yearValues.value[yearIndex] || 0
+    const currentCumulativeValue = cumulativeValues.value[yearIndex] || 0
+    const stageReference = stageValues.value[yearIndex % Math.max(stageValues.value.length, 1)] || 0
     const stabilityBase = currentYearValue && maxYearValue.value
       ? 72 + Math.round((currentYearValue / maxYearValue.value) * 28)
       : 72
 
-    const values = [
-      maxYearValue.value ? Math.round((currentYearValue / maxYearValue.value) * 100) : 0,
+    return [
+      stabilityBase,
+      maxStageValue.value ? Math.round((stageReference / maxStageValue.value) * 100) : 0,
       maxCumulativeValue.value ? Math.round((currentCumulativeValue / maxCumulativeValue.value) * 100) : 0,
-      maxStageValue.value ? Math.round((stageValue / maxStageValue.value) * 100) : 0,
-      stabilityBase
+      maxYearValue.value ? Math.round((currentYearValue / maxYearValue.value) * 100) : 0
     ]
-
-    return values.map((value, metricIndex) => [yearIndex, metricIndex, value])
   })
+})
+
+const heatmapData = computed(() => {
+  return heatmapRows.value.flatMap((row, yearIndex) =>
+    row.map((value, metricIndex) => [yearIndex, metricIndex, value])
+  )
 })
 
 const metricSeriesData = computed(() => {
   return heatmapMetrics.map((metric, metricIndex) => ({
     name: metric,
-    values: years.value.map((_, yearIndex) => {
-      const match = heatmapData.value.find(
-        ([currentYearIndex, currentMetricIndex]) =>
-          currentYearIndex === yearIndex && currentMetricIndex === metricIndex
-      )
-
-      return match ? match[2] : 0
-    })
+    values: years.value.map((_, yearIndex) => heatmapRows.value[yearIndex]?.[metricIndex] ?? 0)
   }))
 })
+
+const getHeatmapColor = (value) => {
+  const alpha = 0.14 + (Number(value || 0) / 100) * 0.72
+  return `rgba(126, 161, 138, ${alpha.toFixed(3)})`
+}
+
+const getHeatmapHoverColor = (value) => {
+  const alpha = 0.24 + (Number(value || 0) / 100) * 0.76
+  return `rgba(126, 161, 138, ${Math.min(alpha, 0.98).toFixed(3)})`
+}
 
 const yearOption = computed(() => ({
   tooltip: {
@@ -224,7 +224,7 @@ const yearOption = computed(() => ({
     ...tooltipStyle
   },
   grid: {
-    left: 20,
+    left: 18,
     right: 12,
     top: 18,
     bottom: 12,
@@ -267,10 +267,10 @@ const yearOption = computed(() => ({
   series: [
     {
       type: 'bar',
-      barWidth: 20,
+      barWidth: 28,
       data: yearValues.value,
       itemStyle: {
-        borderRadius: [10, 10, 0, 0],
+        borderRadius: [12, 12, 0, 0],
         color: '#89ab95'
       },
       emphasis: {
@@ -361,31 +361,142 @@ const cumulativeOption = computed(() => ({
   ]
 }))
 
-const heatmapOption = computed(() => ({
+const typeOption = computed(() => ({
   tooltip: {
-    position: 'top',
+    trigger: 'item',
+    formatter: '{b}：{c}（{d}%）',
+    ...tooltipStyle
+  },
+  legend: {
+    bottom: 8,
+    left: 'center',
+    icon: 'circle',
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: {
+      color: axisLabelColor
+    }
+  },
+  color: ['#89ab95', '#b7cab2', '#d8e4d5'],
+  series: [
+    {
+      type: 'pie',
+      radius: ['58%', '76%'],
+      center: ['50%', '42%'],
+      avoidLabelOverlap: true,
+      minAngle: 8,
+      itemStyle: {
+        borderColor: 'rgba(255,255,255,0.88)',
+        borderWidth: 4
+      },
+      label: {
+        show: true,
+        position: 'outside',
+        color: 'rgba(38, 64, 51, 0.72)',
+        formatter: '{b}\n{d}%',
+        fontSize: 12,
+        lineHeight: 18
+      },
+      labelLine: {
+        length: 14,
+        length2: 10,
+        lineStyle: {
+          color: 'rgba(38, 64, 51, 0.2)'
+        }
+      },
+      labelLayout: {
+        hideOverlap: true
+      },
+      data: props.typeData
+    }
+  ]
+}))
+
+const stageOption = computed(() => ({
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    },
+    ...tooltipStyle
+  },
+  grid: {
+    left: 18,
+    right: 18,
+    top: 16,
+    bottom: 8,
+    containLabel: true
+  },
+  xAxis: {
+    type: 'value',
+    splitNumber: 4,
+    axisLine: {
+      show: false
+    },
+    axisTick: {
+      show: false
+    },
+    splitLine: {
+      lineStyle: {
+        color: splitLineColor
+      }
+    },
+    axisLabel: {
+      color: secondaryAxisColor
+    }
+  },
+  yAxis: {
+    type: 'category',
+    data: stageNames.value,
+    axisLine: {
+      show: false
+    },
+    axisTick: {
+      show: false
+    },
+    axisLabel: {
+      color: axisLabelColor
+    }
+  },
+  series: [
+    {
+      type: 'bar',
+      barWidth: 18,
+      data: stageValues.value,
+      itemStyle: {
+        borderRadius: [0, 10, 10, 0],
+        color: '#a7bf9d'
+      },
+      emphasis: {
+        itemStyle: {
+          color: '#89ab95'
+        }
+      }
+    }
+  ]
+}))
+
+const heatmapOption = computed(() => ({
+  animation: false,
+  tooltip: {
+    trigger: 'item',
     formatter: (params) => {
-      const [yearIndex, metricIndex, value] = params.data
+      const [yearIndex, metricIndex, value] = params.value
       return `${years.value[yearIndex]}<br/>${heatmapMetrics[metricIndex]}：${value}`
     },
     ...tooltipStyle
   },
   grid: {
-    left: 24,
-    right: 18,
-    top: 16,
-    bottom: 18,
-    containLabel: true
+    left: 124,
+    right: 12,
+    top: 54,
+    bottom: 10,
+    containLabel: false
   },
   xAxis: {
     type: 'category',
     data: years.value,
-    splitArea: {
-      show: true,
-      areaStyle: {
-        color: ['rgba(255,255,255,0.22)', 'rgba(245, 249, 244, 0.32)']
-      }
-    },
+    position: 'top',
     axisLine: {
       show: false
     },
@@ -393,18 +504,15 @@ const heatmapOption = computed(() => ({
       show: false
     },
     axisLabel: {
-      color: axisLabelColor
+      color: 'rgba(38, 64, 51, 0.58)',
+      fontSize: 13,
+      fontWeight: 600,
+      margin: 16
     }
   },
   yAxis: {
     type: 'category',
     data: heatmapMetrics,
-    splitArea: {
-      show: true,
-      areaStyle: {
-        color: ['rgba(255,255,255,0.24)', 'rgba(245, 249, 244, 0.34)']
-      }
-    },
     axisLine: {
       show: false
     },
@@ -412,42 +520,76 @@ const heatmapOption = computed(() => ({
       show: false
     },
     axisLabel: {
-      color: axisLabelColor
-    }
-  },
-  visualMap: {
-    min: 0,
-    max: 100,
-    calculable: false,
-    orient: 'horizontal',
-    left: 'center',
-    bottom: -2,
-    textStyle: {
-      color: secondaryAxisColor
-    },
-    inRange: {
-      color: ['#eef4ec', '#d5e4d0', '#a7bf9d', '#7ea18a']
+      color: 'rgba(38, 64, 51, 0.58)',
+      fontSize: 13,
+      fontWeight: 600,
+      margin: 18
     }
   },
   series: [
     {
-      type: 'heatmap',
+      type: 'custom',
+      coordinateSystem: 'cartesian2d',
       data: heatmapData.value,
-      label: {
-        show: true,
-        color: '#355547',
-        fontSize: 12,
-        fontWeight: 600
-      },
-      itemStyle: {
-        borderRadius: 14,
-        borderColor: 'rgba(255,255,255,0.72)',
-        borderWidth: 3
-      },
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 18,
-          shadowColor: 'rgba(124, 162, 138, 0.24)'
+      renderItem: (params, api) => {
+        const xIndex = api.value(0)
+        const yIndex = api.value(1)
+        const cellValue = api.value(2)
+        const point = api.coord([xIndex, yIndex])
+        const cellWidth = api.size([1, 0])[0]
+        const cellHeight = api.size([0, 1])[1]
+        const gap = 6
+        const shape = {
+          x: point[0] - cellWidth / 2 + gap / 2,
+          y: point[1] - cellHeight / 2 + gap / 2,
+          width: Math.max(cellWidth - gap, 0),
+          height: Math.max(cellHeight - gap, 0),
+          r: 14
+        }
+
+        return {
+          type: 'group',
+          children: [
+            {
+              type: 'rect',
+              shape,
+              style: {
+                fill: getHeatmapColor(cellValue),
+                stroke: 'rgba(255,255,255,0.92)',
+                lineWidth: 2
+              },
+              emphasis: {
+                style: {
+                  fill: getHeatmapHoverColor(cellValue),
+                  stroke: 'rgba(255,255,255,1)',
+                  lineWidth: 3,
+                  shadowBlur: 18,
+                  shadowColor: 'rgba(126, 161, 138, 0.26)',
+                  shadowOffsetY: 6
+                }
+              }
+            },
+            {
+              type: 'text',
+              style: {
+                x: point[0],
+                y: point[1],
+                text: String(cellValue),
+                textAlign: 'center',
+                textVerticalAlign: 'middle',
+                fill: '#355547',
+                fontSize: 15,
+                fontWeight: 700
+              },
+              emphasis: {
+                style: {
+                  fill: '#264033',
+                  fontSize: 16,
+                  fontWeight: 800
+                }
+              }
+            }
+          ]
         }
       }
     }
@@ -470,10 +612,10 @@ const featureTrendOption = computed(() => ({
     }
   },
   grid: {
-    left: 16,
-    right: 12,
+    left: 18,
+    right: 16,
     top: 44,
-    bottom: 8,
+    bottom: 10,
     containLabel: true
   },
   xAxis: {
@@ -545,112 +687,6 @@ const featureTrendOption = computed(() => ({
       : undefined
   }))
 }))
-
-const typeOption = computed(() => ({
-  tooltip: {
-    trigger: 'item',
-    ...tooltipStyle
-  },
-  legend: {
-    bottom: 6,
-    left: 'center',
-    icon: 'circle',
-    itemWidth: 10,
-    itemHeight: 10,
-    textStyle: {
-      color: axisLabelColor
-    }
-  },
-  color: ['#89ab95', '#b7cab2', '#d8e4d5'],
-  series: [
-    {
-      type: 'pie',
-      radius: ['52%', '74%'],
-      center: ['50%', '40%'],
-      avoidLabelOverlap: true,
-      itemStyle: {
-        borderColor: 'rgba(255,255,255,0.88)',
-        borderWidth: 4
-      },
-      label: {
-        color: 'rgba(38, 64, 51, 0.72)',
-        formatter: '{b}\n{d}%',
-        fontSize: 12,
-        lineHeight: 18
-      },
-      labelLine: {
-        lineStyle: {
-          color: 'rgba(38, 64, 51, 0.2)'
-        }
-      },
-      data: props.typeData
-    }
-  ]
-}))
-
-const stageOption = computed(() => ({
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'shadow'
-    },
-    ...tooltipStyle
-  },
-  grid: {
-    left: 18,
-    right: 12,
-    top: 12,
-    bottom: 4,
-    containLabel: true
-  },
-  xAxis: {
-    type: 'value',
-    splitNumber: 3,
-    axisLine: {
-      show: false
-    },
-    axisTick: {
-      show: false
-    },
-    splitLine: {
-      lineStyle: {
-        color: splitLineColor
-      }
-    },
-    axisLabel: {
-      color: secondaryAxisColor
-    }
-  },
-  yAxis: {
-    type: 'category',
-    data: props.stageData.map((item) => item.name),
-    axisLine: {
-      show: false
-    },
-    axisTick: {
-      show: false
-    },
-    axisLabel: {
-      color: axisLabelColor
-    }
-  },
-  series: [
-    {
-      type: 'bar',
-      barWidth: 14,
-      data: props.stageData.map((item) => item.value),
-      itemStyle: {
-        borderRadius: [0, 10, 10, 0],
-        color: '#a7bf9d'
-      },
-      emphasis: {
-        itemStyle: {
-          color: '#89ab95'
-        }
-      }
-    }
-  ]
-}))
 </script>
 
 <style scoped lang="less">
@@ -658,20 +694,27 @@ const stageOption = computed(() => ({
   overflow: hidden;
 }
 
+.period-card:deep(.base-card__body) {
+  min-width: 0;
+}
+
 .chart-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-  grid-template-rows: auto auto auto;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-areas:
+    'timeline pie'
+    'timeline stage'
+    'heatmap heatmap';
   gap: 18px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .chart-panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 100%;
-  padding: 18px 18px 14px;
+  overflow: hidden;
+  padding: 18px 18px 16px;
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(244, 248, 242, 0.82));
@@ -682,26 +725,28 @@ const stageOption = computed(() => ({
 }
 
 .chart-panel--timeline {
-  grid-row: span 2;
+  grid-area: timeline;
   background:
     radial-gradient(circle at top left, rgba(143, 177, 155, 0.12), transparent 32%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(244, 248, 242, 0.82));
 }
 
 .chart-panel--pie {
+  grid-area: pie;
   background:
     radial-gradient(circle at top right, rgba(127, 158, 179, 0.08), transparent 26%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(244, 248, 242, 0.82));
 }
 
 .chart-panel--stage {
+  grid-area: stage;
   background:
     radial-gradient(circle at bottom right, rgba(167, 191, 157, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(244, 248, 242, 0.82));
 }
 
 .chart-panel--heatmap {
-  grid-column: 1 / -1;
+  grid-area: heatmap;
   background:
     radial-gradient(circle at center top, rgba(124, 162, 138, 0.1), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(244, 248, 242, 0.86));
@@ -774,16 +819,21 @@ const stageOption = computed(() => ({
 
 .chart-stack {
   display: grid;
-  grid-template-rows: minmax(320px, 1fr) minmax(220px, 0.72fr);
   gap: 14px;
-  flex: 1 1 auto;
+}
+
+.chart-stack--timeline {
+  grid-template-rows: auto auto;
+}
+
+.chart-stack--insight {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .chart-block {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  padding: 12px 12px 8px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 12px 12px 10px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.34);
 }
@@ -793,8 +843,20 @@ const stageOption = computed(() => ({
     linear-gradient(180deg, rgba(245, 249, 244, 0.9), rgba(236, 243, 234, 0.72));
 }
 
-.chart-block--radar {
-  min-height: 0;
+.chart-block--tall {
+  min-height: 360px;
+}
+
+.chart-block--medium {
+  min-height: 280px;
+}
+
+.chart-block--pie {
+  min-height: 400px;
+}
+
+.chart-block--stage {
+  min-height: 290px;
 }
 
 .chart-block__title {
@@ -809,67 +871,63 @@ const stageOption = computed(() => ({
 }
 
 .chart--bar {
-  height: 100%;
-  min-height: 320px;
+  height: 330px;
 }
 
-.chart--line {
-  height: 100%;
-  min-height: 220px;
+.chart--line,
+.chart--trend {
+  height: 250px;
 }
 
 .chart--pie {
-  height: 324px;
+  height: 370px;
 }
 
 .chart--stage {
-  height: 220px;
+  height: 250px;
 }
 
 .chart--heatmap {
-  height: 320px;
-}
-
-.chart-stack--insight {
-  grid-template-rows: minmax(320px, auto) minmax(280px, auto);
-}
-
-.chart--radar {
-  height: 280px;
+  height: 330px;
 }
 
 @media (max-width: 1200px) {
   .chart-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: none;
+    grid-template-areas:
+      'timeline'
+      'pie'
+      'stage'
+      'heatmap';
   }
 
   .metric-strip {
     grid-template-columns: 1fr;
-  }
-
-  .chart-stack {
-    grid-template-rows: 300px 240px;
-  }
-
-  .chart--pie,
-  .chart--stage,
-  .chart--heatmap {
-    height: 300px;
-  }
-
-  .chart-stack--insight {
-    grid-template-rows: 300px 280px;
-  }
-
-  .chart--radar {
-    height: 280px;
   }
 }
 
 @media (max-width: 720px) {
-  .metric-strip {
-    grid-template-columns: 1fr;
+  .chart-panel {
+    padding: 16px;
+  }
+
+  .chart-block--tall {
+    min-height: 320px;
+  }
+
+  .chart-block--medium,
+  .chart-block--pie,
+  .chart-block--stage {
+    min-height: 260px;
+  }
+
+  .chart--bar,
+  .chart--heatmap,
+  .chart--pie,
+  .chart--stage,
+  .chart--line,
+  .chart--trend {
+    height: 240px;
   }
 }
 </style>
