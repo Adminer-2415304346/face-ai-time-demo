@@ -2,6 +2,7 @@
   <BaseCard
     title="跨期样本时间轴"
     desc="展示目标个体在不同年份的参考样本"
+    class="timeline-card"
   >
     <div v-if="list.length" class="timeline">
       <div v-for="item in list" :key="item.id" class="timeline__item">
@@ -10,7 +11,10 @@
         <div class="timeline__label">{{ item.label }}</div>
       </div>
     </div>
-    <div v-else class="timeline-empty">识别完成后，这里会展示该个体的跨期参考样本。</div>
+
+    <div v-else class="timeline-empty">
+      识别完成后，这里会展示该个体的跨期参考样本。
+    </div>
   </BaseCard>
 </template>
 
@@ -26,6 +30,20 @@ defineProps({
 </script>
 
 <style scoped lang="less">
+.timeline-card {
+  height: 100%;
+}
+
+.timeline-card:deep(.base-card) {
+  height: 100%;
+}
+
+.timeline-card:deep(.base-card__body) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
 .timeline {
   display: flex;
   gap: 14px;
@@ -34,6 +52,11 @@ defineProps({
 }
 
 .timeline-empty {
+  flex: 1 1 auto;
+  min-height: 132px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 24px 18px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.38);

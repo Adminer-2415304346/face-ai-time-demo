@@ -255,7 +255,7 @@ onBeforeUnmount(() => {
 
 .recognition-bottom-grid {
   grid-template-columns: minmax(0, 1fr) 320px;
-  align-items: start;
+  align-items: stretch;
 }
 
 @media (min-width: 1280px) and (min-aspect-ratio: 16 / 10) {
